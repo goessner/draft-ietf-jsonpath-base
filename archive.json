@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2021-04-29T01:05:16.911762+00:00",
+  "timestamp": "2021-05-02T01:11:44.671740+00:00",
   "repo": "ietf-wg-jsonpath/draft-ietf-jsonpath-base",
   "labels": [
     {
@@ -1883,7 +1883,7 @@
       "labels": [],
       "body": "**Proposal**: JSONPath should have support to relative paths (to a current context), so it can be used as a building block for more advanced usages. \r\n\r\nXPath makes a clear distinction between relative and absolute paths, e.g.:\r\n\r\ngiven the following XML input:\r\n```xml\r\n<root>\r\n    <e>foo</e>\r\n    <a>\r\n        <b>\r\n            <c><d>1</d><e>bar1</e></c>\r\n            <c><d>2</d><e>bar2</e></c>\r\n            <c><d>3</d><e>bar3</e></c>\r\n        </b>\r\n    </a>\r\n</root>\r\n```\r\n\r\nand the following template, which uses the relative XPath `d` and the absolute XPath `/root/e`:\r\n\r\n```xml\r\n<?xml version=\"1.0\"?>\r\n<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"1.0\">\r\n    <xsl:template match=\"/\">\r\n        <x>\r\n            <xsl:for-each select=\"root/a/b/c\">\r\n                <item>\r\n                    <y><xsl:value-of select=\"d\"/></y>\r\n                    <z><xsl:value-of select=\"/root/e\"/></z>\r\n                </item>\r\n            </xsl:for-each>\r\n        </x>\r\n    </xsl:template>\r\n</xsl:stylesheet>\r\n```\r\n\r\nthe following XML can be produced:\r\n```xml\r\n<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<x>\r\n    <item>\r\n        <y>1</y>\r\n        <z>foo</z>\r\n    </item>\r\n    <item>\r\n        <y>2</y>\r\n        <z>foo</z>\r\n    </item>\r\n    <item>\r\n        <y>3</y>\r\n        <z>foo</z>\r\n    </item>\r\n</x>\r\n```\r\n\r\nI think that in a similar fashion JSONPath should allow relative paths as a building feature for more advanced usages.\r\n\r\n*Remark: I acknowledge that templating/transforms are out of scope here, however I believe that we must consider enabling more advanced usages.* \r\n\r\n**Suggested implementation**: JSONPath spec should mention that `$` is always the document root, while any JSONPath which doesn't start with '$' is relative to the current context.\r\nThis wouldn't change the behavior for several existing implementations since they can assume that current context == document root.\r\n**Additional note**: There is also a number of implementations for which a JSONPath without starting `$` always evaluates to `[]`, given the previous definition we can state that their current context is always set to `null`, therefore this change would allow both as valid JSONPath spec implementations.",
       "createdAt": "2021-03-09T14:48:45Z",
-      "updatedAt": "2021-03-29T18:44:13Z",
+      "updatedAt": "2021-04-29T09:22:25Z",
       "closedAt": null,
       "comments": [
         {
@@ -2137,6 +2137,13 @@
           "body": "I still firmly support this.",
           "createdAt": "2021-03-29T18:44:13Z",
           "updatedAt": "2021-03-29T18:44:13Z"
+        },
+        {
+          "author": "bettio",
+          "authorAssociation": "NONE",
+          "body": "No new activity in last month.\r\n@glyn are you willing to compute consensus based on the whole discussion?",
+          "createdAt": "2021-04-29T09:21:02Z",
+          "updatedAt": "2021-04-29T09:22:25Z"
         }
       ]
     },
@@ -2464,7 +2471,7 @@
       "labels": [],
       "body": "(This was original raised in #54 and now being split out)\r\n\r\n\r\n> Related to that, it would be helpful to determine if JSONPath filters\r\napply to both JSON objects and arrays, or only to JSON arrays.\r\n*(Daniel P)*\r\n\r\n> I would support restricting filters to arrays, if others agree.\r\n*(Glyn Normington)*\r\n\r\nI tend to let implementations and their \"normative force of the factual\" decide here or in doubt agree to Glyn's restriction to arrays.\r\n\r\nI am very unhappy with confusing `$..book[(@.length-1)]`, where `'@'` addresses the array itself and implies that array has a `length` property. In filter expression examples `'@'` more consistently addresses the current array element.\r\n\r\nThe invocation of 'the underlying scripting engine' wasn't meant a serious normative aspect, but rather a quick and dirty solution for JavaScript and PHP implementations at that time.\r\n\r\n\r\n### Corner Case\r\n\r\n> Consider this perfectly legal JSON object\r\n>\r\n> ```{ \"ab\": 0,  \"'a.b\": 1,  \"a-b\": 2, \"a\": { \"b\": 3 } }```\r\n>\r\n>So `$.ab` is 0, `$.a.b` is 3, `$['a.b']` is 1, `$['a-b']` is 2. You'd like to say `$.a-b` but lots of libraries will refuse it because `\"a-b\"` is not a legal JavaScript \"name\" construct, that's why you have to say `$['a-b']`.\r\n>\r\n> But suppose your library would accept `$.a-b`.  Then `$.a-b` and `$['a-b']` would be synonyms, but `$.a.b` and `$['a.b']` wouldn't.\r\n*(Tim Bray)*\r\n\r\nHmm ... this seems to be a hint to better exclude `'-'` from dot-child-selector syntax. I think I have read more discussion about that, currently don't know where.\r\n",
       "createdAt": "2021-03-10T15:07:12Z",
-      "updatedAt": "2021-03-29T19:38:10Z",
+      "updatedAt": "2021-04-30T11:51:04Z",
       "closedAt": null,
       "comments": [
         {
@@ -2480,6 +2487,27 @@
           "body": "Can we close this?",
           "createdAt": "2021-03-29T19:38:10Z",
           "updatedAt": "2021-03-29T19:38:10Z"
+        },
+        {
+          "author": "goessner",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Filter expressions `[?(<expr>)]` are completely missing in the current draft.\r\n\r\nImplementations agree, that filter expressions are an essential feature with JSONPath. They are considered much more important than \"index expressions\" `[(<expr>)]`, given that term \"index\" is an interim synonym for \"name / index\" ([#84](https://github.com/ietf-wg-jsonpath/draft-ietf-jsonpath-base/issues/84#issuecomment-809245242)).\r\n\r\nThere are already some discussions about filters (historically ascending):\r\n\r\n* Non-property-name-friendly chars [#16](https://github.com/ietf-wg-jsonpath/draft-ietf-jsonpath-base/issues/16)\r\n* Query expression language support [#17](https://github.com/ietf-wg-jsonpath/draft-ietf-jsonpath-base/issues/17)\r\n* Treating of duplicates [#23](https://github.com/ietf-wg-jsonpath/draft-ietf-jsonpath-base/issues/23)\r\n* Security items [#25](https://github.com/ietf-wg-jsonpath/draft-ietf-jsonpath-base/issues/25)\r\n* Filter applied to JSON object [#47](https://github.com/ietf-wg-jsonpath/draft-ietf-jsonpath-base/issues/47)\r\n* Some observations on the 3 March 2021 draft [#56](https://github.com/ietf-wg-jsonpath/draft-ietf-jsonpath-base/issues/56)\r\n* JSONPath expression and bracket-notation [#57](https://github.com/ietf-wg-jsonpath/draft-ietf-jsonpath-base/issues/57)\r\n* Regular expressions in filters [#70](https://github.com/ietf-wg-jsonpath/draft-ietf-jsonpath-base/issues/70)\r\n* The problem of comparing an evaluated expression with a json literal [#74](https://github.com/ietf-wg-jsonpath/draft-ietf-jsonpath-base/issues/74)\r\n* The \"current value\" or \"current node\", and the meaning thereof [#76](https://github.com/ietf-wg-jsonpath/draft-ietf-jsonpath-base/issues/76)\r\n\r\n## 1. Term \"filter expression\"\r\n\r\nThe WG still has to decide, if we want to use the term \"filter expression\" in the draft, as there are some objections against it ([#20](https://github.com/ietf-wg-jsonpath/draft-ietf-jsonpath-base/issues/20#issue-707818524)).\r\n\r\nAs an alternative the term \"filter selector\" was proposed, which is used below.\r\n\r\n## 2. Apply Filter Selector to Objects\r\n\r\nThere seems to be no agreement, if filters should be applied to objects ([#47](https://github.com/ietf-wg-jsonpath/draft-ietf-jsonpath-base/issues/47)).\r\n\r\nConsider a school,\r\n```json\r\n{\r\n    \"students\": [...],\r\n    \"staff\": [...],\r\n    \"teachers\": [...]\r\n}\r\n```\r\nwhile looking for the array(s) containing persons named 'M\u00fcller' by `'$[?(@..name == 'M\u00fcller')]'`, which is not the same as looking for the persons themself by `'$.*[?(@.name == 'M\u00fcller')]'`.\r\n\r\nI can see value for allowing filter selectors applied to objects and not really a rational reason to exclude them from filtering.\r\n\r\n## 3. How Filter Selectors Work\r\n\r\nFilter selectors work via iterating over arrays and objects, provided the latter is allowed by the spec. \r\n\r\n### 3.1 Selecting\r\n\r\nDuring iteration process the value of each array element or object member is taken and evaluated against an implicite boolean expression `<expr>` in `'[?(<expr)]'`. If the result is *truthy*, the item is selected. In case of a *falsy* result, it is not.\r\n\r\n### 3.2 The Current Value `@`\r\n\r\nIn expression `<expr>`, the special selector `'@'` represents the currently visited JSON value during iteration process. The most simple JSONPath expression with a filter selector is `'$[?(@)]'`, collecting all items of the related container, provided their individual value is interpreted as truthy.\r\n\r\nSpecial selector `'@'` used outside of filter selectors may have completely different meaning.\r\n\r\n## 4. Syntax\r\n\r\n### 4.1 Filter Selector Syntax\r\n\r\n```abnf\r\nfilter-selector    = \"[?(\" expr \")]\"\r\n```\r\nThere are some discussions / implementations that are leaving out the parentheses. In this case syntax reads:\r\n\r\n```abnf\r\nfilter-selector    = \"[?\" expr \"]\"\r\n```\r\nIt needs to be discussed, if the last - more minimally - syntax works in all practical cases. If it does and `expr` is allowed to contain parentheses, above original syntax would be also valid automatically.\r\n\r\n### 4.2 Filter Selector Expression Syntax\r\n\r\nImplicite boolean expression `expr` is evaluated and converted to the JSON values `true` or `false`. Selection occures in the `true` case only.\r\n\r\nGreg proposes a minimal set of basic comparison, mathematical, and boolean operators [#17](https://github.com/ietf-wg-jsonpath/draft-ietf-jsonpath-base/issues/17):\r\n\r\n```\r\n==   equal\r\n!=   not equal\r\n<    less than\r\n<=   less than or equal to\r\n>    greater than\r\n>=   greater than or equal to\r\n\r\n+    addition\r\n-    subtraction\r\n*    multiplication\r\n/    division\r\n%    modulus\r\n\r\n&&   and\r\n||   or\r\n```\r\n\r\nTaking this set of operators, excluding arithmetic operators for now, we have something like this:\r\n\r\n```abnf\r\nexpr                = *comparisons\r\ncomparisons         = [\"(\"] comparison *[logical-operator comparison] [\")\"]\r\nlogical-operator    = \"||\" / \"&&\"\r\ncomparison          = relative-path [comparison-operator value]\r\ncomparison-operator = \"==\" / \"!=\" / \"<\" / \">\" / \"<=\" / \">=\"\r\nvalue               = number / quoted-string / true / false / null\r\nrelative-path       = \"@\" *(dot-selector / index-selector)\r\n```\r\n`dot-selector` and `index-selector` is defined elsewhere. `number`, `quoted-string` and `null` is defined analog to RFC8259.\r\n\r\n### 4.3 Arithmetic operator Extension\r\n\r\nTwo scenarios for using (binary) arithmetic operators `op` are possible.\r\n\r\n1. Use it on the left side of the comparison, i.e. `'relativ-path op (relativ-path | number)'`. Here it is implied, that values on both sides of the comparison are of type `number`. If one or both are `string` or `null` it must be decided, what to do.\r\n2. Use it on the right side of the comparison is a trivial thing for number literals and might be directly replaced by its arithmetic result.\r\n\r\nI can hardly see relevant practical use cases here and would opt for not supporting arithmetic operators at the first glance.\r\n\r\n### 4.4 `in` operator Extension\r\n\r\nAn `in` operator might be useful. Examples are\r\n\r\n```js\r\n[?(@.color in ['red','green','blue'])]\r\n[?(@.type in [1,2,4,8])]\r\n```\r\n\r\nIn fact, supporting this would be pure syntactic sugar, as it can always be replaced by\r\n\r\n```js\r\n[?(@.color == 'red' || @.color == 'green' || @.color == 'blue')]\r\n[?(@.type == 1 || @.type == 2 || @.type == 4 || @.type == 8)]\r\n```\r\nWhats your opinion? With minimalism in mind I would opt against it.\r\n\r\n### 4.5 Nested Filter Selectors\r\n\r\nGreg pointed us to an [SO question](https://stackoverflow.com/questions/67017189/jsonpath-can-not-get-the-needed-value-using-expressions). Herein an array element (an object itself) is to be selected, if and only if its subarray property contains an element having a certain index/value pair. Somewhat like\r\n\r\n```js\r\n$.arr[?(@.type == 'a' && @.subarr[?(@.prop == 'b')])]\r\n```\r\nIn this case `relative-path` in 4.2 above should be modified to\r\n\r\n```abnf\r\nrelative-path = \"@\" *(dot-selector / index-selector / filter-selector)\r\n```\r\n\r\nWhat's the general opinion here ?\r\n\r\n### 4.6 Regular expressions with Filter Selectors\r\n\r\nSee [Regular expressions in filters #70](https://github.com/ietf-wg-jsonpath/draft-ietf-jsonpath-base/issues/70).\r\n\r\nI see usefulness here.\r\n",
+          "createdAt": "2021-04-30T10:48:32Z",
+          "updatedAt": "2021-04-30T10:48:32Z"
+        },
+        {
+          "author": "gregsdennis",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "First, why post here? This is a duplicate issue, as I noted.\r\n\r\n> They are considered much more important than \"index expressions\" `[(<expr>)]`...\r\n\r\n_**A**_ being \"more important\" (really meaning \"more commonly used\") than _**B**_ does not imply that _**B**_ should be excluded.\r\n\r\nThe index expression format has its uses that cannot be replicated with other mechanisms.  It should be included.",
+          "createdAt": "2021-04-30T11:32:05Z",
+          "updatedAt": "2021-04-30T11:51:04Z"
+        },
+        {
+          "author": "gregsdennis",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "> If the result is truthy, the item is selected. In case of a falsy result, it is not.\r\n\r\nWe still need to define \"truthiness.\"  There is still [active discussion](https://github.com/ietf-wg-jsonpath/draft-ietf-jsonpath-base/issues/57#issuecomment-793423011) on this topic.\r\n\r\n> `in` operator Extension\r\n\r\nI see the utility of this.  It does open up the door for other operators.  The inverse of this operator would be `contains`, e.g. `[?(@.colors contains 'red'])]`.\r\n\r\nI'm sure we can think of others.\r\n\r\n> Nested Filter Selectors\r\n\r\nWe need to address scoping.  `$` can always be used to access the root of the input value, and `@` access the \"current\" element.  But once we introduce nested filters, identifying what `@` represents gets murky.\r\n\r\nMaybe `@@` can denote the nested scope instead of just a single `@`.  This leaves the single `@` to denote the initial interated scope.  I can't imagine this would be used much, and maybe we include this functionality with a SHOULD or RECOMMENDED so that it's not a hard requirement, which will alleviate pressure on implementors.",
+          "createdAt": "2021-04-30T11:48:09Z",
+          "updatedAt": "2021-04-30T11:48:09Z"
         }
       ]
     },
@@ -3686,7 +3714,7 @@
       "labels": [],
       "body": "Clusters of terms:\r\n\r\n* Cluster 1\r\n\r\n  * JSON value\r\n  * (data) item\r\n  * node\r\n  * location\r\n\r\n  These are related, but different.  We probably do not need all four.\r\n  (Of course, JSON value is a 8259 term, so it does not go away.)\r\n  We should decide which of these terms we want to use, and what they exactly mean.\r\n  A node seems to be a combination of a discrete JSON value and its location.\r\n  JSON value seems to imply equivalence by value (even though equivalence is undefined in RFC 8259),\r\n  while node is based on equivalence by identity.\r\n  Location seems to imply that you can get to the node (and thus the value) from it.\r\n\r\n* Cluster 2\r\n\r\n  * Argument: input to executing JSON query\r\n  * root value, root node (used as Argument, may be used in nested queries)\r\n  * current node (current item):\r\n    * input to selector function invocation, \r\n    * maybe used inside filtering/indexing selectors\r\n\r\n* Cluster 3\r\n\r\n  * selector (part of the selector chain that makes up a JSONPath query)\r\n  * (we probably need a word for) selector function \\[invocation]\r\n\r\n    This is needed if we stick to the model that each node in the\r\n    input node list is treated separately and the results are then\r\n    combined using (TBD) combine1.\r\n\r\n  * combine1 (placeholder for what combines the outputs of the selector function invocations)\r\n\r\n    This becomes important when we either resolve there is only one\r\n    combine1 function or we resolve that combine1 functions are\r\n    (within limits) implemenation specific (i.e., we give up) or that\r\n    different selectors have different combine1 functions.\r\n\r\n  All these can only be meaningfully decided once we have agreement on a processing model.\r\n",
       "createdAt": "2021-03-24T12:38:46Z",
-      "updatedAt": "2021-03-29T09:55:00Z",
+      "updatedAt": "2021-05-01T00:29:01Z",
       "closedAt": null,
       "comments": [
         {
@@ -3814,6 +3842,69 @@
           "body": "I think we can stick with 8259 for member name.  Key is maybe indeed a candidate for \"member name or array index\".\r\n\r\nI'll propose a PR as soon as #90 is through (too many conflicts otherwise).\r\n",
           "createdAt": "2021-03-29T09:55:00Z",
           "updatedAt": "2021-03-29T09:55:00Z"
+        },
+        {
+          "author": "goessner",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Following on from the previous comments, I propose to add two additional terms to the terminology list:\r\n* **Key**: Synonym for array index or object member name.\r\n\r\n* **Selector**: An atomic component of a query expression. Different selector types are ...\r\n    * Root selector `'$'`\r\n    * Current item selector `'@'`\r\n    * Nested descendants selector `'..'`.\r\n    * Dot selector `'.<name>'`, used with object member names exclusively.\r\n    * Dot wild card selector `'.*'`.\r\n    * Key selector `'[<key>]'`, where `<key>` is either an (possibly negative) array index or an object member name.\r\n    * Key wild card selector `'[*]'`.\r\n    * Array slice selector `'[<start>:<end>:<step>]'`, where `<start>`, `<end>`, `<step>` are integer literals.\r\n    * Union selector `'[<key1>,<key2>,...,<keyN>]'`, holding a comma delimited list of keys.\r\n    * Filter selector `[?(<expr>)]`\r\n\r\nI hope I did not miss a selector type. Also, I dislike the current fact, that union selectors are first class citizens in the spec. They should be equal among equal. Let's discuss ...\r\n",
+          "createdAt": "2021-04-29T14:38:48Z",
+          "updatedAt": "2021-04-29T14:38:48Z"
+        },
+        {
+          "author": "cabo",
+          "authorAssociation": "MEMBER",
+          "body": "On 2021-04-29, at 16:39, Stefan Goessner ***@***.***> wrote:\n> \n> \t\u2022 Key: Synonym for array index or object member name.\n\nHow about maybe index/key?  index key?  indexing key?\n\nGr\u00fc\u00dfe, Carsten\n\n",
+          "createdAt": "2021-04-29T15:02:36Z",
+          "updatedAt": "2021-04-29T15:02:36Z"
+        },
+        {
+          "author": "goessner",
+          "authorAssociation": "COLLABORATOR",
+          "body": "We will use that mostly in the form \"key/value pair\", where \"index/key/value pair\" is confusing. \"index/value pair\" would be better then, but \"index\" alone is often mentally completed to \"array index\".",
+          "createdAt": "2021-04-29T15:27:29Z",
+          "updatedAt": "2021-04-29T15:27:29Z"
+        },
+        {
+          "author": "goessner",
+          "authorAssociation": "COLLABORATOR",
+          "body": "... if agreement goes to \"index/value pair\", I can live with it ...",
+          "createdAt": "2021-04-29T15:33:04Z",
+          "updatedAt": "2021-04-29T15:33:04Z"
+        },
+        {
+          "author": "gregsdennis",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "~I still think \"index\" denotes an array specifically.~\n\nThinking over this again, yeah, index/value.  For reasons I've mention above.  (Sorry, typing without thinking)",
+          "createdAt": "2021-04-30T06:15:36Z",
+          "updatedAt": "2021-04-30T06:23:42Z"
+        },
+        {
+          "author": "goessner",
+          "authorAssociation": "COLLABORATOR",
+          "body": "ok ... then ...\r\n\r\n* **Index**: Synonym for array index or object member name.\r\n\r\n* **Selector**: An atomic component of a query expression. Different selector types are ...\r\n    * Root selector `'$'`\r\n    * Current item selector `'@'`\r\n    * Nested descendants selector `'..'`.\r\n    * Dot selector `'.<name>'`, used with object member names exclusively.\r\n    * Dot wild card selector `'.*'`.\r\n    * Index selector `'[<index>]'`, where `<index>` is either an (possibly negative) array index or an object member name.\r\n    * Index wild card selector `'[*]'`.\r\n    * Array slice selector `'[<start>:<end>:<step>]'`, where `<start>`, `<end>`, `<step>` are integer literals.\r\n    * Union selector `'[<index1>,<index2>,...,<indexN>]'`, holding a comma delimited list of indices (indexes ?).\r\n    * Filter selector `[?(<expr>)]`\r\n\r\n",
+          "createdAt": "2021-04-30T07:07:19Z",
+          "updatedAt": "2021-04-30T07:07:19Z"
+        },
+        {
+          "author": "gregsdennis",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "\"Indices\" is more correct, but \"indexes\" has become more common recently.\n\nAlso, I still think we should include the `[(<expr>)]`  selector.  I've already explained its uses in other issues, but we should keep it for no other reason than people will complain if it's not supported.",
+          "createdAt": "2021-04-30T11:25:44Z",
+          "updatedAt": "2021-04-30T11:26:02Z"
+        },
+        {
+          "author": "goessner",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Well ... I would like to get filter selector syntax straight first. Then discuss, if and what subset of it we want to support with index selectors.",
+          "createdAt": "2021-04-30T12:36:44Z",
+          "updatedAt": "2021-04-30T12:36:44Z"
+        },
+        {
+          "author": "gregsdennis",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I would expect that the expression syntax would be the same. The resulting value would need to, instead of being truthy, be able to evaluate to a well-defined index, e.g. a number or string.",
+          "createdAt": "2021-05-01T00:29:01Z",
+          "updatedAt": "2021-05-01T00:29:01Z"
         }
       ]
     },
