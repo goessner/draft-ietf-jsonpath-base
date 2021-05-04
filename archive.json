@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2021-05-02T01:11:44.671740+00:00",
+  "timestamp": "2021-05-04T01:02:16.569606+00:00",
   "repo": "ietf-wg-jsonpath/draft-ietf-jsonpath-base",
   "labels": [
     {
@@ -2471,7 +2471,7 @@
       "labels": [],
       "body": "(This was original raised in #54 and now being split out)\r\n\r\n\r\n> Related to that, it would be helpful to determine if JSONPath filters\r\napply to both JSON objects and arrays, or only to JSON arrays.\r\n*(Daniel P)*\r\n\r\n> I would support restricting filters to arrays, if others agree.\r\n*(Glyn Normington)*\r\n\r\nI tend to let implementations and their \"normative force of the factual\" decide here or in doubt agree to Glyn's restriction to arrays.\r\n\r\nI am very unhappy with confusing `$..book[(@.length-1)]`, where `'@'` addresses the array itself and implies that array has a `length` property. In filter expression examples `'@'` more consistently addresses the current array element.\r\n\r\nThe invocation of 'the underlying scripting engine' wasn't meant a serious normative aspect, but rather a quick and dirty solution for JavaScript and PHP implementations at that time.\r\n\r\n\r\n### Corner Case\r\n\r\n> Consider this perfectly legal JSON object\r\n>\r\n> ```{ \"ab\": 0,  \"'a.b\": 1,  \"a-b\": 2, \"a\": { \"b\": 3 } }```\r\n>\r\n>So `$.ab` is 0, `$.a.b` is 3, `$['a.b']` is 1, `$['a-b']` is 2. You'd like to say `$.a-b` but lots of libraries will refuse it because `\"a-b\"` is not a legal JavaScript \"name\" construct, that's why you have to say `$['a-b']`.\r\n>\r\n> But suppose your library would accept `$.a-b`.  Then `$.a-b` and `$['a-b']` would be synonyms, but `$.a.b` and `$['a.b']` wouldn't.\r\n*(Tim Bray)*\r\n\r\nHmm ... this seems to be a hint to better exclude `'-'` from dot-child-selector syntax. I think I have read more discussion about that, currently don't know where.\r\n",
       "createdAt": "2021-03-10T15:07:12Z",
-      "updatedAt": "2021-04-30T11:51:04Z",
+      "updatedAt": "2021-05-03T15:15:26Z",
       "closedAt": null,
       "comments": [
         {
@@ -2508,6 +2508,48 @@
           "body": "> If the result is truthy, the item is selected. In case of a falsy result, it is not.\r\n\r\nWe still need to define \"truthiness.\"  There is still [active discussion](https://github.com/ietf-wg-jsonpath/draft-ietf-jsonpath-base/issues/57#issuecomment-793423011) on this topic.\r\n\r\n> `in` operator Extension\r\n\r\nI see the utility of this.  It does open up the door for other operators.  The inverse of this operator would be `contains`, e.g. `[?(@.colors contains 'red'])]`.\r\n\r\nI'm sure we can think of others.\r\n\r\n> Nested Filter Selectors\r\n\r\nWe need to address scoping.  `$` can always be used to access the root of the input value, and `@` access the \"current\" element.  But once we introduce nested filters, identifying what `@` represents gets murky.\r\n\r\nMaybe `@@` can denote the nested scope instead of just a single `@`.  This leaves the single `@` to denote the initial interated scope.  I can't imagine this would be used much, and maybe we include this functionality with a SHOULD or RECOMMENDED so that it's not a hard requirement, which will alleviate pressure on implementors.",
           "createdAt": "2021-04-30T11:48:09Z",
           "updatedAt": "2021-04-30T11:48:09Z"
+        },
+        {
+          "author": "goessner",
+          "authorAssociation": "COLLABORATOR",
+          "body": "### Correctum: 4.5 Nested Filter Selectors\r\n\r\nAs I should have been thinking a little longer, I finally realized, that there is no need for nested filter selectors in example above ...\r\n```js\r\n$.arr[?(@.type == 'a' && @.subarr[?(@.prop == 'b')])]\r\n```\r\n... as this might be resolved conventionally by\r\n```js\r\n$.arr[?(@.type == 'a' && @.subarr[*].prop == 'b')])]\r\n```\r\nwithout nesting. I am doubtful, that significant real world examples exist, which are not resolvable without nesting.\r\nSo let's ignore that feature in the spec and leave it to implementations for now.\r\n\r\n",
+          "createdAt": "2021-05-02T10:39:53Z",
+          "updatedAt": "2021-05-02T10:39:53Z"
+        },
+        {
+          "author": "goessner",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> > `in` operator Extension\r\n> \r\n> I see the utility of this. It does open up the door for other operators. The inverse of this operator would be `contains`, e.g. `[?(@.colors contains 'red'])]`.\r\n\r\nCan be solved without `contains` by `[?(@.colors[*] == 'red')]`.\r\n\r\nWe should take care, not inflationary inventing operators.\r\n",
+          "createdAt": "2021-05-02T10:48:33Z",
+          "updatedAt": "2021-05-02T10:48:33Z"
+        },
+        {
+          "author": "goessner",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> We still need to define \"truthiness.\" There is still [active discussion](https://github.com/ietf-wg-jsonpath/draft-ietf-jsonpath-base/issues/57#issuecomment-793423011) on this topic.\r\n\r\nyes, you are right. Or better define falsiness, as Daniel proposes ...\r\n\r\n> Typical conditions to determine whether an arbitrary JSON value can be considered false are:\r\n>\r\n> - empty array: [],\r\n> - empty object: {},\r\n> - empty string: \"\",\r\n> - false boolean,\r\n> - null,\r\n> - zero integer.\r\n\r\nadding ...\r\n\r\n- undefined, i.e. not existing !\r\n\r\n",
+          "createdAt": "2021-05-02T10:56:03Z",
+          "updatedAt": "2021-05-02T10:56:03Z"
+        },
+        {
+          "author": "gregsdennis",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "> Can be solved without contains by `[?(@.colors[*] == 'red')]`.\n\nWhat are we saying here? `@.colors[*]` returns an array.   So you're implying that `==` functions as a `contains` operator?  That's hideous!  Operators shouldn't be overloaded like that.\n\n> Or better define falsiness, as Daniel proposes ...\n\nMy point is that I don't like the idea of loose equality at all, and I expect implementors in other strongly typed language will have the same reservations.",
+          "createdAt": "2021-05-02T19:31:01Z",
+          "updatedAt": "2021-05-02T19:33:01Z"
+        },
+        {
+          "author": "goessner",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> \r\n> \r\n> > Can be solved without contains by `[?(@.colors[*] == 'red')]`.\r\n> \r\n> What are we saying here? `@.colors[*]` returns an array. So you're implying that `==` functions as a `contains` operator? That's hideous! Operators shouldn't be overloaded like that.\r\n\r\nHmm ... what have I been thinking? You are right. It doesn't work that way, of course. I did not intend to introduce an implicit 'contains' operator.\r\n\r\nGiven this, nested filters and/or a contains operator is still worth a discussion.",
+          "createdAt": "2021-05-03T15:10:32Z",
+          "updatedAt": "2021-05-03T15:10:32Z"
+        },
+        {
+          "author": "goessner",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> > Or better define falsiness, as Daniel proposes ...\r\n> \r\n> My point is that I don't like the idea of loose equality at all, and I expect implementors in other strongly typed language will have the same reservations.\r\n\r\nWe don't address implementors but ordinary users of JSONPath, which are not necessarily programmers using strongly typed languages.\r\n\r\nOk ... what exactly do equality comparisons look like then? What do you propose?",
+          "createdAt": "2021-05-03T15:15:25Z",
+          "updatedAt": "2021-05-03T15:15:25Z"
         }
       ]
     },
