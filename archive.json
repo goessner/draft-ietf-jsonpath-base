@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2021-05-04T01:02:16.569606+00:00",
+  "timestamp": "2021-05-06T00:58:18.997062+00:00",
   "repo": "ietf-wg-jsonpath/draft-ietf-jsonpath-base",
   "labels": [
     {
@@ -1883,7 +1883,7 @@
       "labels": [],
       "body": "**Proposal**: JSONPath should have support to relative paths (to a current context), so it can be used as a building block for more advanced usages. \r\n\r\nXPath makes a clear distinction between relative and absolute paths, e.g.:\r\n\r\ngiven the following XML input:\r\n```xml\r\n<root>\r\n    <e>foo</e>\r\n    <a>\r\n        <b>\r\n            <c><d>1</d><e>bar1</e></c>\r\n            <c><d>2</d><e>bar2</e></c>\r\n            <c><d>3</d><e>bar3</e></c>\r\n        </b>\r\n    </a>\r\n</root>\r\n```\r\n\r\nand the following template, which uses the relative XPath `d` and the absolute XPath `/root/e`:\r\n\r\n```xml\r\n<?xml version=\"1.0\"?>\r\n<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"1.0\">\r\n    <xsl:template match=\"/\">\r\n        <x>\r\n            <xsl:for-each select=\"root/a/b/c\">\r\n                <item>\r\n                    <y><xsl:value-of select=\"d\"/></y>\r\n                    <z><xsl:value-of select=\"/root/e\"/></z>\r\n                </item>\r\n            </xsl:for-each>\r\n        </x>\r\n    </xsl:template>\r\n</xsl:stylesheet>\r\n```\r\n\r\nthe following XML can be produced:\r\n```xml\r\n<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<x>\r\n    <item>\r\n        <y>1</y>\r\n        <z>foo</z>\r\n    </item>\r\n    <item>\r\n        <y>2</y>\r\n        <z>foo</z>\r\n    </item>\r\n    <item>\r\n        <y>3</y>\r\n        <z>foo</z>\r\n    </item>\r\n</x>\r\n```\r\n\r\nI think that in a similar fashion JSONPath should allow relative paths as a building feature for more advanced usages.\r\n\r\n*Remark: I acknowledge that templating/transforms are out of scope here, however I believe that we must consider enabling more advanced usages.* \r\n\r\n**Suggested implementation**: JSONPath spec should mention that `$` is always the document root, while any JSONPath which doesn't start with '$' is relative to the current context.\r\nThis wouldn't change the behavior for several existing implementations since they can assume that current context == document root.\r\n**Additional note**: There is also a number of implementations for which a JSONPath without starting `$` always evaluates to `[]`, given the previous definition we can state that their current context is always set to `null`, therefore this change would allow both as valid JSONPath spec implementations.",
       "createdAt": "2021-03-09T14:48:45Z",
-      "updatedAt": "2021-04-29T09:22:25Z",
+      "updatedAt": "2021-05-04T17:37:49Z",
       "closedAt": null,
       "comments": [
         {
@@ -2144,6 +2144,13 @@
           "body": "No new activity in last month.\r\n@glyn are you willing to compute consensus based on the whole discussion?",
           "createdAt": "2021-04-29T09:21:02Z",
           "updatedAt": "2021-04-29T09:22:25Z"
+        },
+        {
+          "author": "glyn",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> No new activity in last month.\r\n> @glyn are you willing to compute consensus based on the whole discussion?\r\n\r\nNo, I'll leave that to the Chairs, thanks.",
+          "createdAt": "2021-05-04T17:37:49Z",
+          "updatedAt": "2021-05-04T17:37:49Z"
         }
       ]
     },
@@ -2471,7 +2478,7 @@
       "labels": [],
       "body": "(This was original raised in #54 and now being split out)\r\n\r\n\r\n> Related to that, it would be helpful to determine if JSONPath filters\r\napply to both JSON objects and arrays, or only to JSON arrays.\r\n*(Daniel P)*\r\n\r\n> I would support restricting filters to arrays, if others agree.\r\n*(Glyn Normington)*\r\n\r\nI tend to let implementations and their \"normative force of the factual\" decide here or in doubt agree to Glyn's restriction to arrays.\r\n\r\nI am very unhappy with confusing `$..book[(@.length-1)]`, where `'@'` addresses the array itself and implies that array has a `length` property. In filter expression examples `'@'` more consistently addresses the current array element.\r\n\r\nThe invocation of 'the underlying scripting engine' wasn't meant a serious normative aspect, but rather a quick and dirty solution for JavaScript and PHP implementations at that time.\r\n\r\n\r\n### Corner Case\r\n\r\n> Consider this perfectly legal JSON object\r\n>\r\n> ```{ \"ab\": 0,  \"'a.b\": 1,  \"a-b\": 2, \"a\": { \"b\": 3 } }```\r\n>\r\n>So `$.ab` is 0, `$.a.b` is 3, `$['a.b']` is 1, `$['a-b']` is 2. You'd like to say `$.a-b` but lots of libraries will refuse it because `\"a-b\"` is not a legal JavaScript \"name\" construct, that's why you have to say `$['a-b']`.\r\n>\r\n> But suppose your library would accept `$.a-b`.  Then `$.a-b` and `$['a-b']` would be synonyms, but `$.a.b` and `$['a.b']` wouldn't.\r\n*(Tim Bray)*\r\n\r\nHmm ... this seems to be a hint to better exclude `'-'` from dot-child-selector syntax. I think I have read more discussion about that, currently don't know where.\r\n",
       "createdAt": "2021-03-10T15:07:12Z",
-      "updatedAt": "2021-05-03T15:15:26Z",
+      "updatedAt": "2021-05-04T08:36:17Z",
       "closedAt": null,
       "comments": [
         {
@@ -2550,6 +2557,27 @@
           "body": "> > Or better define falsiness, as Daniel proposes ...\r\n> \r\n> My point is that I don't like the idea of loose equality at all, and I expect implementors in other strongly typed language will have the same reservations.\r\n\r\nWe don't address implementors but ordinary users of JSONPath, which are not necessarily programmers using strongly typed languages.\r\n\r\nOk ... what exactly do equality comparisons look like then? What do you propose?",
           "createdAt": "2021-05-03T15:15:25Z",
           "updatedAt": "2021-05-03T15:15:25Z"
+        },
+        {
+          "author": "glyn",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> So let's ignore [nested filter expressions] in the spec and leave it to implementations for now.\r\n\r\nI think the spec should define whether or not any given JSONPath is syntactically valid rather than leaving this up to implementations. What do others think about this general principle?\r\n\r\nAlso, I'm not sure _how_ the spec's syntax and compliance test suite could allow implementation-specific variants.\r\n\r\nThere isn't much of a [consensus](https://cburgmer.github.io/json-path-comparison/results/filter_expression_with_subfilter.html) among existing implementations about the behaviour of nested filter expressions. However, [Proposal A](https://github.com/cburgmer/json-path-comparison/tree/master/proposals/Proposal_A) neatly [disallows](https://cburgmer.github.io/json-path-comparison/results/filter_expression_with_subfilter.html#Proposal_A) nested filter expressions, along with certain other complicated filter expressions. OTOH, I quite like not having apparently arbitrary syntactic restrictions and so [my implementation](https://github.com/vmware-labs/yaml-jsonpath) [allows](https://cburgmer.github.io/json-path-comparison/results/filter_expression_with_subfilter.html#Golang_github.com-vmware-labs-yaml-jsonpath) nested filter expressions.\r\n\r\n",
+          "createdAt": "2021-05-04T02:24:29Z",
+          "updatedAt": "2021-05-04T02:24:29Z"
+        },
+        {
+          "author": "gregsdennis",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "> Ok ... what exactly do equality comparisons look like then? What do you propose? - @goessner \n\nDoing loose equality in a strongly-typed system is a serious pain.  However, strict equality in a loosely-typed system is generally easy. For example, JS uses the `===` operator to facilitate this.  I realize that my opinion is biased, but I speak from (recent) experience of having to do the former.\n\n> I think the spec should define whether or not any given JSONPath is syntactically valid rather than leaving this up to implementations. - @glyn \n\nDefinitely, yes, the spec should be as precise and prescriptive as possible on what it covers.  However, I do think that it does need to allow for implementations to expand on the domain in order to foster new syntaxes and ideas, so long as those implementations call out those deviations as non-standard.\n\nI think the spec _should_ define its support for nested queries, even if it's to say they're not supported.  I also think that it should support index queries.\n\nHowever, I recognize that it says _nothing at all_ in regard to expressions currently, and I'm on board with getting _something_ in place to cover the things we at least agree on right now so long as it's done in a way to leave the door open to incorporate these other features after we've discussed them further.",
+          "createdAt": "2021-05-04T08:00:54Z",
+          "updatedAt": "2021-05-04T08:01:28Z"
+        },
+        {
+          "author": "cabo",
+          "authorAssociation": "MEMBER",
+          "body": "The spec should be well-defined, but also provide extension points -- both for third parties to use and for evolution of the spec itself.\r\n",
+          "createdAt": "2021-05-04T08:36:17Z",
+          "updatedAt": "2021-05-04T08:36:17Z"
         }
       ]
     },
