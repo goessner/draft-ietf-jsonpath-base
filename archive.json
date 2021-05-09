@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2021-05-06T00:58:18.997062+00:00",
+  "timestamp": "2021-05-09T01:04:19.051285+00:00",
   "repo": "ietf-wg-jsonpath/draft-ietf-jsonpath-base",
   "labels": [
     {
@@ -3080,7 +3080,7 @@
       "labels": [],
       "body": "Issue 17 [proposed](https://github.com/ietf-wg-jsonpath/draft-ietf-jsonpath-jsonpath/issues/17#issuecomment-797044615) regular expressions in filters, which is supported by [several implementations](https://cburgmer.github.io/json-path-comparison/results/filter_expression_with_regular_expression.html) of JSONPath. This raises two questions:\r\n\r\n1. What is the precise syntax of regular expressions?\r\n2. How should [ReDOS attacks](https://github.com/ietf-wg-jsonpath/draft-ietf-jsonpath-jsonpath/issues/25#issuecomment-700801725) be mitigated?\r\n\r\nOne approach which addresses both these questions would be to adopt [RE2 syntax](https://github.com/google/re2/wiki/Syntax) as discussed in [ReDOS attacks](https://github.com/ietf-wg-jsonpath/draft-ietf-jsonpath-jsonpath/issues/25#issuecomment-700801725), although not all languages may yet have support for RE2.",
       "createdAt": "2021-03-12T05:00:59Z",
-      "updatedAt": "2021-03-28T11:51:48Z",
+      "updatedAt": "2021-05-06T21:38:08Z",
       "closedAt": null,
       "comments": [
         {
@@ -3313,6 +3313,13 @@
           "body": "It's 2021, so all (notable) RE standards support Unicode.\r\n\r\nI think, for once, recent drafts from json-schema.org got this right:\r\nLet's define a common subset, and reference that to an existing written up standard such as ECMAScript.\r\n(json-schema.org got the idea right, not necessarily the specific subset -- there is quite some fluff in that.)\r\n\r\nIf nobody else wants, I'll do a PR with an ABNF definition of such a subset.\r\nWe can then debate what to leave in/throw out/add.\r\n",
           "createdAt": "2021-03-28T11:51:48Z",
           "updatedAt": "2021-03-28T11:51:48Z"
+        },
+        {
+          "author": "gregsdennis",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Example [StackOverflow question](https://stackoverflow.com/q/67417229/878701) that could be solved using RegEx.",
+          "createdAt": "2021-05-06T21:38:08Z",
+          "updatedAt": "2021-05-06T21:38:08Z"
         }
       ]
     },
