@@ -163,7 +163,7 @@ Table of Contents
    For the purposes of this specification, a value as defined by
    [RFC8259] is also viewed as a tree of nodes.  Each node, in turn,
    holds a value.  Furthernodes within each value are the elements of
-   Arrays and the member values of objects and are themselves Values.
+   Arrays and the member values of objects and are themselves values.
    (The type of the value held by a node is may also be referred to as
    the type of the node.)
 
@@ -201,7 +201,7 @@ Table of Contents
    x['store']['book'][0]['title']
 
    in popular programming languages such as JavaScript, Python and PHP,
-   with a variable x holding the Argument.  Here we observe that such
+   with a variable x holding the argument.  Here we observe that such
    languages already have a fundamentally XPath-like feature built in.
 
    The JSONPath tool in question should:
@@ -216,9 +216,9 @@ Table of Contents
 
 1.3.  Overview of JSONPath Expressions
 
-   JSONPath expressions always apply to a Value in the same way as XPath
+   JSONPath expressions always apply to a value in the same way as XPath
    expressions are used in combination with an XML document.  Since a
-   Value is anonymous, JSONPath uses the abstract name "$" to refer to
+   value is anonymous, JSONPath uses the abstract name "$" to refer to
    the root node of the argument.
 
    JSONPath expressions can use the _dot-notation_
@@ -318,9 +318,9 @@ Table of Contents
 2.  JSONPath Examples
 
    This section provides some more examples for JSONPath expressions.
-   The examples are based on the simple Value shown in Figure 1, which
-   was patterned after a typical XML example representing a bookstore
-   (that also has bicycles).
+   The examples are based on the simple JSON value shown in Figure 1,
+   which was patterned after a typical XML example representing a
+   bookstore (that also has bicycles).
 
    { "store": {
        "book": [
@@ -402,10 +402,11 @@ Table of Contents
    |                      |                         | values and      |
    |                      |                         | array elements  |
    |                      |                         | contained in    |
-   |                      |                         | Value           |
+   |                      |                         | input value     |
    +----------------------+-------------------------+-----------------+
 
-    Table 2: Example JSONPath expressions applied to the example Value
+       Table 2: Example JSONPath expressions applied to the example
+                                JSON value
 
 3.  JSONPath Syntax and Semantics
 
@@ -425,8 +426,8 @@ Table of Contents
    also fulfills all semantic requirements posed by this document.
 
    The well-formedness and the validity of JSONPath queries are
-   independent of the Value the query is applied to; no further errors
-   can be raised during application of the query to a Value.
+   independent of the value the query is applied to; no further errors
+   can be raised during application of the query to a value.
 
    (Obviously, an implementation can still fail when executing a
    JSONPath query, e.g., because of resource depletion, but this is not
@@ -481,7 +482,7 @@ Table of Contents
 3.3.  Syntax
 
    Syntactically, a JSONPath consists of a root selector ("$"), which
-   stands for a nodelist that contains the root node of the Argument,
+   stands for a nodelist that contains the root node of the argument,
    followed by a possibly empty sequence of _selectors_.
 
    json-path = root-selector *selector
@@ -513,9 +514,9 @@ Table of Contents
    each of which is a descendant of the node or the node itself.
 
       Discussion (D4): Is that a common requirement?  Or can a selector
-      also go up, or to the query Argument?
+      also go up, or to the query argument?
 
-   For instance, with the Argument "{"a":[{"b":0},{"b":1},{"c":2}]}",
+   For instance, with the argument "{"a":[{"b":0},{"b":1},{"c":2}]}",
    the JSONPath "$.a[*].b" selects the following list of nodes: "0", "1"
    (denoted here by their value).  Let's walk through this in detail.
 

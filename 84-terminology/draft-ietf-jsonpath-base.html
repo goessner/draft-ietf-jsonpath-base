@@ -1155,7 +1155,7 @@ to, but syntactically different from, a JSON Pointer <span>[<a href="#RFC6901" c
 <span>[<a href="#RFC8259" class="xref">RFC8259</a>]</span> is also viewed as a tree of nodes.
 Each node, in turn, holds a value.
 Furthernodes within each value are the elements of Arrays and the
-member values of objects and are themselves Values.
+member values of objects and are themselves values.
 (The type of the value held by a node is
 may also be referred to as the type of the node.)<a href="#section-1.1-6" class="pilcrow">¶</a></p>
 <p id="section-1.1-7">A query is applied to an argument, and the output is a nodelist.<a href="#section-1.1-7" class="pilcrow">¶</a></p>
@@ -1202,7 +1202,7 @@ x['store']['book'][0]['title']
 </pre><a href="#section-1.2-10" class="pilcrow">¶</a>
 </div>
 <p id="section-1.2-11">in popular programming languages such as JavaScript, Python and PHP,
-with a variable x holding the Argument.  Here we observe that
+with a variable x holding the argument.  Here we observe that
 such languages already have a fundamentally XPath-like feature built
 in.<a href="#section-1.2-11" class="pilcrow">¶</a></p>
 <p id="section-1.2-12">The JSONPath tool in question should:<a href="#section-1.2-12" class="pilcrow">¶</a></p>
@@ -1223,9 +1223,9 @@ in.<a href="#section-1.2-11" class="pilcrow">¶</a></p>
         <h3 id="name-overview-of-jsonpath-expres">
 <a href="#section-1.3" class="section-number selfRef">1.3. </a><a href="#name-overview-of-jsonpath-expres" class="section-name selfRef">Overview of JSONPath Expressions</a>
         </h3>
-<p id="section-1.3-1">JSONPath expressions always apply to a Value in the same way
+<p id="section-1.3-1">JSONPath expressions always apply to a value in the same way
 as XPath expressions are used in combination with an XML document.
-Since a Value is anonymous, JSONPath uses the abstract name <code>$</code> to
+Since a value is anonymous, JSONPath uses the abstract name <code>$</code> to
 refer to the root node of the argument.<a href="#section-1.3-1" class="pilcrow">¶</a></p>
 <p id="section-1.3-2">JSONPath expressions can use the <em>dot-notation</em><a href="#section-1.3-2" class="pilcrow">¶</a></p>
 <div class="artwork art-text alignLeft" id="section-1.3-3">
@@ -1415,7 +1415,7 @@ addressed by the previous path fragment. Array indices always start at 0.<a href
 <a href="#section-2" class="section-number selfRef">2. </a><a href="#name-jsonpath-examples" class="section-name selfRef">JSONPath Examples</a>
       </h2>
 <p id="section-2-1">This section provides some more examples for JSONPath expressions.
-The examples are based on the simple Value shown in
+The examples are based on the simple JSON value shown in
 <a href="#fig-example-value" class="xref">Figure 1</a>, which was patterned after a
 typical XML example representing a bookstore (that also has bicycles).<a href="#section-2-1" class="pilcrow">¶</a></p>
 <span id="name-example-value"></span><div id="fig-example-value">
@@ -1467,7 +1467,7 @@ constant.<a href="#section-2-3" class="pilcrow">¶</a></p>
 <table class="center" id="table-2">
         <caption>
 <a href="#table-2" class="selfRef">Table 2</a>:
-<a href="#name-example-jsonpath-expression" class="selfRef">Example JSONPath expressions applied to the example Value</a>
+<a href="#name-example-jsonpath-expression" class="selfRef">Example JSONPath expressions applied to the example JSON value</a>
         </caption>
 <thead>
           <tr>
@@ -1565,7 +1565,7 @@ constant.<a href="#section-2-3" class="pilcrow">¶</a></p>
             <td class="text-left" rowspan="1" colspan="1">
               <code>$..*</code>
 </td>
-            <td class="text-left" rowspan="1" colspan="1">all elements in XML document; all member values and array elements contained in Value</td>
+            <td class="text-left" rowspan="1" colspan="1">all elements in XML document; all member values and array elements contained in input value</td>
           </tr>
         </tbody>
       </table>
@@ -1595,8 +1595,8 @@ of JSONPath.
 A well-formed JSONPath query is valid if it also fulfills all semantic
 requirements posed by this document.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
 <p id="section-3.1-4">The well-formedness and the validity of JSONPath queries are independent of
-the Value the query is applied to; no further errors can be
-raised during application of the query to a Value.<a href="#section-3.1-4" class="pilcrow">¶</a></p>
+the value the query is applied to; no further errors can be
+raised during application of the query to a value.<a href="#section-3.1-4" class="pilcrow">¶</a></p>
 <p id="section-3.1-5">(Obviously, an implementation can still fail when executing a JSONPath
 query, e.g., because of resource depletion, but this is not modeled in
 the present specification.)<a href="#section-3.1-5" class="pilcrow">¶</a></p>
@@ -1658,7 +1658,7 @@ selector or a set of nodes subordinate to that current node.<a href="#section-3.
 <a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-syntax" class="section-name selfRef">Syntax</a>
         </h3>
 <p id="section-3.3-1">Syntactically, a JSONPath consists of a root selector (<code>$</code>), which
-stands for a nodelist that contains the root node of the Argument,
+stands for a nodelist that contains the root node of the argument,
 followed by a possibly empty sequence of <em>selectors</em>.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
 <div id="section-3.3-2">
 <pre class="sourcecode lang-abnf">
@@ -1696,10 +1696,10 @@ variant, or can we always use the same?<a href="#section-3.4-4.1" class="pilcrow
 each of which is a descendant of the node or the node itself.<a href="#section-3.4-5" class="pilcrow">¶</a></p>
 <ul class="ulEmpty normal">
 <li class="ulEmpty normal" id="section-3.4-6.1">Discussion (D4): Is that a common requirement?  Or can a selector also go
-up, or to the query Argument?<a href="#section-3.4-6.1" class="pilcrow">¶</a>
+up, or to the query argument?<a href="#section-3.4-6.1" class="pilcrow">¶</a>
 </li>
         </ul>
-<p id="section-3.4-7">For instance, with the Argument <code>{"a":[{"b":0},{"b":1},{"c":2}]}</code>, the
+<p id="section-3.4-7">For instance, with the argument <code>{"a":[{"b":0},{"b":1},{"c":2}]}</code>, the
 JSONPath <code>$.a[*].b</code> selects the following list of nodes: <code>0</code>, <code>1</code>
 (denoted here by their value).
 Let's walk through this in detail.<a href="#section-3.4-7" class="pilcrow">¶</a></p>
