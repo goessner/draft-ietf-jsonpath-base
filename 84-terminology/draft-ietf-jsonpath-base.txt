@@ -354,7 +354,7 @@ Table of Contents
      }
    }
 
-                          Figure 1: Example Value
+                        Figure 1: Example JSON value
 
    The examples in Table 2 use the expression mechanism to obtain the
    number of elements in an array, to test for the presence of a member
