@@ -5,12 +5,12 @@
 JSONPath WG                                           G. Normington, Ed.
 Internet-Draft                                                          
 Intended status: Standards Track                           E. Surov, Ed.
-Expires: 13 November 2021                        TheSoul Publishing Ltd.
+Expires: 14 November 2021                        TheSoul Publishing Ltd.
                                                        M. Mikulicic, Ed.
                                                         InfluxData, Inc.
                                                               S. Gössner
                                                  Fachhochschule Dortmund
-                                                             12 May 2021
+                                                             13 May 2021
 
 
                   JSONPath: Query expressions for JSON
@@ -47,7 +47,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 13 November 2021.
+   This Internet-Draft will expire on 14 November 2021.
 
 Copyright Notice
 
@@ -127,7 +127,7 @@ Table of Contents
    and "array" in particular do not take on a generic meaning, such as
    they would in a general programming context.
 
-   Member:  A name/value pair in a JSON object.  (Not itself a value.)
+   Member:  A name/value pair in an object.  (Not itself a value.)
 
    Name:  The name in a name/value pair constituting a member.  (Also
       known as "key", "tag", or "label".)  This is also used in
