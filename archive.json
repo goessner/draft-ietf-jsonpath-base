@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2021-05-09T01:04:19.051285+00:00",
+  "timestamp": "2021-05-13T01:09:35.738157+00:00",
   "repo": "ietf-wg-jsonpath/draft-ietf-jsonpath-base",
   "labels": [
     {
@@ -927,14 +927,14 @@
       "url": "https://github.com/ietf-wg-jsonpath/draft-ietf-jsonpath-base/issues/23",
       "state": "OPEN",
       "author": "gregsdennis",
-      "authorAssociation": "CONTRIBUTOR",
+      "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [
         "processing-model"
       ],
       "body": "Each selector may each return multiple nodes, or even the same node multiple times.  This raises the question of whether (and if so, how) the resulting collection of nodes needs to be distinct, i.e. without duplicates.\r\n\r\nAn example:\r\n\r\n```\r\nJSON instance:\r\n{\r\n  \"a\": [\r\n    \"string\",\r\n    null,\r\n    true\r\n  ],\r\n  \"b\": [\r\n    false,\r\n    \"string\",\r\n    5.4\r\n  ]\r\n}\r\n\r\nPath:\r\n$.*[0,1]\r\n```\r\n\r\nThe raw result set of this selector is `[\"string\", null, false, \"string\"]`.  If we say that we expect only the distinct set of nodes, then the results would be `[\"string\", null, false]`, removing the duplicate `\"string\"`.\r\n\r\nSo the question up for discussion is, \"Should selectors return distinct sets of nodes or are duplicates preferred?\"\r\n\r\n---\r\n\r\nI had been considering a location-based distinction (based on the location of the value in the original JSON structure) as a possibility, but I don't think it makes much sense given the definition of a selector in Section 2.5, taking multiple nodes and outputing multiple nodes.  A selector knows nothing about the original JSON structure that is being evaluated.\r\n\r\nHowever for posterity, consider the following (rather contrived) path evaluated against the above instance:\r\n\r\n```\r\n$.*[0,:5]\r\n```\r\n\r\nIn this case, the `\"string\"` value which is the first element of the `a` property would be selected twice, and the `\"string\"` value in the second element of the `b` property would be selected once, resulting in three `\"string\"` values in the results.  For location-based distinction, only the value from `a` would be considered duplicate, leaving two instances of `\"string\"` in the result set.\r\n\r\nAgain, I *don't* think that this is a viable approach due to how a selector works and the information it's given.  However, if we were to also require [location as part of the output](https://github.com/cburgmer/json-path-comparison/issues/29), then this *would* be a viable solution.",
       "createdAt": "2020-09-25T05:59:57Z",
-      "updatedAt": "2021-03-27T22:52:54Z",
+      "updatedAt": "2021-05-11T10:59:22Z",
       "closedAt": null,
       "comments": [
         {
@@ -946,14 +946,14 @@
         },
         {
           "author": "gregsdennis",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "body": "I think it might be useful to throw a scenario in the consensus project to get actual results of what the various implementations do.",
           "createdAt": "2020-09-25T21:46:29Z",
           "updatedAt": "2020-09-25T21:46:29Z"
         },
         {
           "author": "gregsdennis",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "body": "A scenario has been [added](https://github.com/cburgmer/json-path-comparison/commit/8d8292ef1fdfd6c64d77ff10e8b1e32e1bf5bbbc).  Just waiting on the report to regenerate.\r\n\r\nIt looks like the majority just don't support the example query. For those that do, it seems to be an even mix of all three approaches. No concensus implies no pressure to implement any particular scenario, but we need to discuss and agree on it.",
           "createdAt": "2020-09-28T19:24:21Z",
           "updatedAt": "2020-09-28T19:24:43Z"
@@ -967,14 +967,14 @@
         },
         {
           "author": "gregsdennis",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "body": "I think it can apply to any case where the same value appears in the result more than once.\r\n\r\nI've opened a new issue for discussing result sequence.  I think we need to answer that before we can discuss how it affects duplicates.",
           "createdAt": "2020-10-01T05:40:16Z",
           "updatedAt": "2020-10-01T05:40:16Z"
         },
         {
           "author": "gregsdennis",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "body": "To expand on the reason for combining duplicates a little, I offer a more extensive example and a somewhat informal proof of why eliminating duplicates would be a good thing (when not including location in the output):\r\n\r\nThe instance is similar to Goessner's example, but I've added color to the books and moved the other items under a \"toy\" category so that I can search for array items and use an expression.\r\n\r\n```json\r\n{\r\n  \"store\": {\r\n    \"book\": [ \r\n      {\r\n        \"category\": \"reference\",\r\n        \"author\": \"Nigel Rees\",\r\n        \"title\": \"Sayings of the Century\",\r\n        \"price\": 8.95      },\r\n      {\r\n        \"category\": \"fiction\",\r\n        \"author\": \"Evelyn Waugh\",\r\n        \"title\": \"Sword of Honour\",\r\n        \"price\": 12.99,\r\n        \"color\": \"blue\"\r\n      },\r\n      {\r\n        \"category\": \"fiction\",\r\n        \"author\": \"Herman Melville\",\r\n        \"title\": \"Moby Dick\",\r\n        \"isbn\": \"0-553-21311-3\",\r\n        \"price\": 8.99,\r\n        \"color\": \"red\"\r\n      },\r\n      {\r\n        \"category\": \"fiction\",\r\n        \"author\": \"J. R. R. Tolkien\",\r\n        \"title\": \"The Lord of the Rings\",\r\n        \"isbn\": \"0-395-19395-8\",\r\n        \"price\": 22.99,\r\n        \"color\": \"green\"\r\n      }\r\n    ],\r\n    \"bicycle\": [\r\n      {\r\n        \"color\": \"red\",\r\n        \"price\": 19.95\r\n      },\r\n    ],\r\n    \"tricycle\": [\r\n      {\r\n        \"color\": \"blue\",\r\n        \"price\": 9.95\r\n      },\r\n      {\r\n        \"color\": \"red\",\r\n        \"price\": 19.95\r\n      }\r\n    ]\r\n  }\r\n}\r\n```\r\n\r\nNow if we want the prices of all the things that are red, we can use `$..[?(@.color == \"red\")].price`.  This results in `[8.99, 19.95, 19.95]` without removal and `[8.99, 19.95]` with removal.\r\n\r\nLet's ignore the `.price` for now to see what how the duplicate values are produced.\r\n\r\nThe path `$..[?(@.color == \"red\")]` returns three objects:\r\n\r\n```json\r\n// $.store.book[2]\r\n{\r\n  \"category\": \"fiction\",\r\n  \"author\": \"Herman Melville\",\r\n  \"title\": \"Moby Dick\",\r\n  \"isbn\": \"0-553-21311-3\",\r\n  \"price\": 8.99,\r\n  \"color\": \"red\"\r\n}\r\n\r\n// $.bicycle[0]\r\n{\r\n  \"color\": \"red\",\r\n  \"price\": 19.95\r\n}\r\n\r\n// $.tricycle[1]\r\n{\r\n  \"color\": \"red\",\r\n  \"price\": 19.95\r\n}\r\n```\r\n\r\nNotice that the results for `$.bicycle[0]` and `$.tricycle[1]` are the same.  Any processing on further path segments will result in the same output.  Therefore we should only need to perform further selection once on these values.\r\n\r\nDuplicate removal resolves this problem.\r\n\r\n---\r\n\r\nEven when we include locations, this can be used as an internal optimization.  An implementation could identify that these are the same object and keep track of all the locations which contain it.",
           "createdAt": "2021-01-05T00:49:08Z",
           "updatedAt": "2021-01-05T05:33:59Z"
@@ -988,14 +988,14 @@
         },
         {
           "author": "gregsdennis",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "body": "Ugh... Oversight of editing while authoring.  I'll fix it.\r\n\r\nAaand now I have to rework it to get the duplicates again.",
           "createdAt": "2021-01-05T05:29:10Z",
           "updatedAt": "2021-01-05T05:30:35Z"
         },
         {
           "author": "gregsdennis",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "body": "@mkmik updated.",
           "createdAt": "2021-01-05T05:34:42Z",
           "updatedAt": "2021-01-05T05:34:42Z"
@@ -1044,10 +1044,31 @@
         },
         {
           "author": "gregsdennis",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "body": "> Would the node identified by \"$['books'][0]\" be considered a duplicate?\r\n\r\nNo, we only consider duplicates at the top level of the returned nodelist.  So the values to compare are an array and a string.  That the array also happens to _contain_ the string makes no difference.",
           "createdAt": "2021-03-27T22:52:53Z",
           "updatedAt": "2021-03-27T22:52:53Z"
+        },
+        {
+          "author": "mkmik",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Consider:\r\n\r\n```json\r\n{\r\n  \"x\": {\r\n    \"a\": {\r\n      \"a\": {\r\n        \"b\": 1\r\n      }\r\n    }\r\n  }\r\n}\r\n```\r\n\r\nand this jsonpath: `$..a..b`:\r\n\r\nThe first part of the jsonpath `$..a` selects nodes `{\"a\": {\"a\": { \"b\": 1}}}` and `{\"a\": { \"b\": 1}}`\r\n\r\napplying `..b` on that result set, produces the node `1` twice\r\n\r\n",
+          "createdAt": "2021-05-11T10:31:59Z",
+          "updatedAt": "2021-05-11T10:31:59Z"
+        },
+        {
+          "author": "cabo",
+          "authorAssociation": "MEMBER",
+          "body": "Yes, and we need to agree whether:\r\n\r\n(1) the duplicate nodes are always delivered (which is what we decided today)\r\n\r\n(2) the duplicate nodes are never delivered (which is what we went into the discussion with)\r\n\r\n(3) it depends on the implementation (which IMHO would be a disaster)",
+          "createdAt": "2021-05-11T10:34:27Z",
+          "updatedAt": "2021-05-11T10:34:27Z"
+        },
+        {
+          "author": "mkmik",
+          "authorAssociation": "COLLABORATOR",
+          "body": "IIRC today we were wondering whether:\r\n\r\n(5) the behavior of the descendent selector may be a special case",
+          "createdAt": "2021-05-11T10:59:21Z",
+          "updatedAt": "2021-05-11T10:59:21Z"
         }
       ]
     },
@@ -2166,7 +2187,7 @@
       "labels": [],
       "body": "Does applying a JSONPath query to a JSON data item always generate the same result?\r\n\r\nSome selectors do not have a natural order of the nodelists they return, e.g., $.* applied to a JSON object\r\n\r\nWe could prescribe an order (e.g., sorting keys lexicographically or in JavaScript order) if determinism is important\r\n\r\nWe could disallow .* on JSON objects",
       "createdAt": "2021-03-10T13:02:18Z",
-      "updatedAt": "2021-03-28T00:33:17Z",
+      "updatedAt": "2021-05-12T09:00:29Z",
       "closedAt": null,
       "comments": [
         {
@@ -2213,7 +2234,7 @@
         },
         {
           "author": "gregsdennis",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "body": "We covered this topic over in the JSON Schema repo somewhere with quite a lengthy discussion.  I'll see if I can dig it up.\n\nIn short, parsers in some languages just can't be made to be deterministic.  Reading the same object from a file (where the keys are certainly in a defined sequence) will yield differing orderings when printing or even debugging the value.\n\nThis topic, therefore, falls into the \"language agnosticity\" category.  I don't think it's something we can enforce.",
           "createdAt": "2021-03-10T19:05:51Z",
           "updatedAt": "2021-03-10T19:05:51Z"
@@ -2227,7 +2248,7 @@
         },
         {
           "author": "gregsdennis",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "body": "> Each of them has a number of users, it is really important to not disrupt their existing expressions and their habits.\n\nA noble goal, to be sure. But I imagine that sudden conformance to a spec would natural engender breaking changes, especially in a landscape of Implementation as large as we're dealing with. I don't think it'll be avoided.\n\nAs such, my feeling is that we get the spec right rather than make concessions just because the majority does it some way.\n\n> I think a number of JSONPath implementations are completely decoupled from the JSON parser...\n\nAbsolutely correct.",
           "createdAt": "2021-03-12T11:25:41Z",
           "updatedAt": "2021-03-12T11:25:41Z"
@@ -2262,7 +2283,7 @@
         },
         {
           "author": "gregsdennis",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "body": "FWIW, in implementing JSON Schema, I've found that I need both contents-equality and sequence-equality on arrays depending on the circumstance.\r\n\r\nGiven that JSON Path outputs an array, and the contents of that array are likely to be generated non-deterministically due to evaluating objects, I think it makes sense for implementations to verify evaluation results (e.g. when processing a test suite) in a \"contents-equality\" sense.  It's not per the JSON definition of array equality (which mandates sequence-equality), but I think the circumstance fits.\r\n\r\nThe fact that the result array is not guaranteed to be deterministic would need to be declared in the specification, probably associated with a remark about it deviating from JSON array equalilty and perhaps even an explanation why.",
           "createdAt": "2021-03-17T08:23:49Z",
           "updatedAt": "2021-03-17T08:23:49Z"
@@ -2290,7 +2311,7 @@
         },
         {
           "author": "gregsdennis",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "body": "We need to tread carefully here. Are we saying we're comfortable outputting something that's not JSON but acts really similar?\n\nAll implementations (including @goessner) output an array (or optionally `false`) _as JSON_.  If we suddenly call the output a \"nodelist\" are we breaking that?",
           "createdAt": "2021-03-17T18:27:37Z",
           "updatedAt": "2021-03-17T18:27:37Z"
@@ -2311,7 +2332,7 @@
         },
         {
           "author": "gregsdennis",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "body": "> It also helps reflect the fact that some implementations handle nodelists different from others.\n\nThis is irrelevant because of many of the points that @danielaparker mentioned: essentially, implementations don't use nodelists from what we can tell, they use arrays.  And isn't our charter to break existing implementations as little as possible?  If _all_ implementations use arrays, changing that is not something we should consider lightly.\n\n@cabo We're discussing it here because of [your comment](https://github.com/ietf-wg-jsonpath/draft-ietf-jsonpath-jsonpath/issues/60#issuecomment-800936130).  Following some discussion [elsewhere](https://github.com/ietf-wg-jsonpath/draft-ietf-jsonpath-jsonpath/issues/74#issuecomment-799717411) about expressions, you spammed \"nodelist\" comments anywhere it might be related in order to promote the idea before anyone had a chance to discuss it.  So now we're discussing it.\n\n---\n\nAll of that said, I think we should consider the output format (#23 & #44), determinism (this issue), and paths embedded in expressions (#74) together.  There is some subtle interplay going on.\n\nIf the output is an array of objects that specify location and value, then both that format and the sequence of the items within it need to be considered when returning from an embedded path so that the remainder of the expression can handle it properly.\n\nIf embedded paths are to follow some different output that operators can then use, we need to specify what that is as well.  Maybe that is the idea of a nodelist.  But we need to discuss it first and come to some level of agreement.",
           "createdAt": "2021-03-18T18:52:26Z",
           "updatedAt": "2021-03-18T19:02:08Z"
@@ -2346,7 +2367,7 @@
         },
         {
           "author": "gregsdennis",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "body": "> (@glyn) But I think the following output, for example, should be invalid:\n> \n> - `[0, 2, 1, 3]`\n\nI'm curious why you think this should be invalid.  I understand how you got the result, and if you include (or replace with) the paths to those values, it's just as (or more) clear.\n\nPartial determinism is going to create a bunch of weird edge cases that will be impossible to completely define.",
           "createdAt": "2021-03-19T09:51:59Z",
           "updatedAt": "2021-03-19T09:51:59Z"
@@ -2385,6 +2406,13 @@
           "body": "To be clear, non-determinism in the spec doesn't force implementations to be non-deterministic. But it allows implementations to trade off efficiency against non-determinism. It also allows for variations between (deterministic) implementations.",
           "createdAt": "2021-03-19T10:43:00Z",
           "updatedAt": "2021-03-19T10:43:00Z"
+        },
+        {
+          "author": "gregsdennis",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Also related to (maybe duplicates) #27.",
+          "createdAt": "2021-05-12T09:00:29Z",
+          "updatedAt": "2021-05-12T09:00:29Z"
         }
       ]
     },
@@ -2478,19 +2506,19 @@
       "labels": [],
       "body": "(This was original raised in #54 and now being split out)\r\n\r\n\r\n> Related to that, it would be helpful to determine if JSONPath filters\r\napply to both JSON objects and arrays, or only to JSON arrays.\r\n*(Daniel P)*\r\n\r\n> I would support restricting filters to arrays, if others agree.\r\n*(Glyn Normington)*\r\n\r\nI tend to let implementations and their \"normative force of the factual\" decide here or in doubt agree to Glyn's restriction to arrays.\r\n\r\nI am very unhappy with confusing `$..book[(@.length-1)]`, where `'@'` addresses the array itself and implies that array has a `length` property. In filter expression examples `'@'` more consistently addresses the current array element.\r\n\r\nThe invocation of 'the underlying scripting engine' wasn't meant a serious normative aspect, but rather a quick and dirty solution for JavaScript and PHP implementations at that time.\r\n\r\n\r\n### Corner Case\r\n\r\n> Consider this perfectly legal JSON object\r\n>\r\n> ```{ \"ab\": 0,  \"'a.b\": 1,  \"a-b\": 2, \"a\": { \"b\": 3 } }```\r\n>\r\n>So `$.ab` is 0, `$.a.b` is 3, `$['a.b']` is 1, `$['a-b']` is 2. You'd like to say `$.a-b` but lots of libraries will refuse it because `\"a-b\"` is not a legal JavaScript \"name\" construct, that's why you have to say `$['a-b']`.\r\n>\r\n> But suppose your library would accept `$.a-b`.  Then `$.a-b` and `$['a-b']` would be synonyms, but `$.a.b` and `$['a.b']` wouldn't.\r\n*(Tim Bray)*\r\n\r\nHmm ... this seems to be a hint to better exclude `'-'` from dot-child-selector syntax. I think I have read more discussion about that, currently don't know where.\r\n",
       "createdAt": "2021-03-10T15:07:12Z",
-      "updatedAt": "2021-05-04T08:36:17Z",
+      "updatedAt": "2021-05-11T11:05:57Z",
       "closedAt": null,
       "comments": [
         {
           "author": "gregsdennis",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "body": "This actually already has an issue: #47.",
           "createdAt": "2021-03-10T18:59:30Z",
           "updatedAt": "2021-03-10T18:59:30Z"
         },
         {
           "author": "gregsdennis",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "body": "Can we close this?",
           "createdAt": "2021-03-29T19:38:10Z",
           "updatedAt": "2021-03-29T19:38:10Z"
@@ -2504,14 +2532,14 @@
         },
         {
           "author": "gregsdennis",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "body": "First, why post here? This is a duplicate issue, as I noted.\r\n\r\n> They are considered much more important than \"index expressions\" `[(<expr>)]`...\r\n\r\n_**A**_ being \"more important\" (really meaning \"more commonly used\") than _**B**_ does not imply that _**B**_ should be excluded.\r\n\r\nThe index expression format has its uses that cannot be replicated with other mechanisms.  It should be included.",
           "createdAt": "2021-04-30T11:32:05Z",
           "updatedAt": "2021-04-30T11:51:04Z"
         },
         {
           "author": "gregsdennis",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "body": "> If the result is truthy, the item is selected. In case of a falsy result, it is not.\r\n\r\nWe still need to define \"truthiness.\"  There is still [active discussion](https://github.com/ietf-wg-jsonpath/draft-ietf-jsonpath-base/issues/57#issuecomment-793423011) on this topic.\r\n\r\n> `in` operator Extension\r\n\r\nI see the utility of this.  It does open up the door for other operators.  The inverse of this operator would be `contains`, e.g. `[?(@.colors contains 'red'])]`.\r\n\r\nI'm sure we can think of others.\r\n\r\n> Nested Filter Selectors\r\n\r\nWe need to address scoping.  `$` can always be used to access the root of the input value, and `@` access the \"current\" element.  But once we introduce nested filters, identifying what `@` represents gets murky.\r\n\r\nMaybe `@@` can denote the nested scope instead of just a single `@`.  This leaves the single `@` to denote the initial interated scope.  I can't imagine this would be used much, and maybe we include this functionality with a SHOULD or RECOMMENDED so that it's not a hard requirement, which will alleviate pressure on implementors.",
           "createdAt": "2021-04-30T11:48:09Z",
           "updatedAt": "2021-04-30T11:48:09Z"
@@ -2539,7 +2567,7 @@
         },
         {
           "author": "gregsdennis",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "body": "> Can be solved without contains by `[?(@.colors[*] == 'red')]`.\n\nWhat are we saying here? `@.colors[*]` returns an array.   So you're implying that `==` functions as a `contains` operator?  That's hideous!  Operators shouldn't be overloaded like that.\n\n> Or better define falsiness, as Daniel proposes ...\n\nMy point is that I don't like the idea of loose equality at all, and I expect implementors in other strongly typed language will have the same reservations.",
           "createdAt": "2021-05-02T19:31:01Z",
           "updatedAt": "2021-05-02T19:33:01Z"
@@ -2567,7 +2595,7 @@
         },
         {
           "author": "gregsdennis",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "body": "> Ok ... what exactly do equality comparisons look like then? What do you propose? - @goessner \n\nDoing loose equality in a strongly-typed system is a serious pain.  However, strict equality in a loosely-typed system is generally easy. For example, JS uses the `===` operator to facilitate this.  I realize that my opinion is biased, but I speak from (recent) experience of having to do the former.\n\n> I think the spec should define whether or not any given JSONPath is syntactically valid rather than leaving this up to implementations. - @glyn \n\nDefinitely, yes, the spec should be as precise and prescriptive as possible on what it covers.  However, I do think that it does need to allow for implementations to expand on the domain in order to foster new syntaxes and ideas, so long as those implementations call out those deviations as non-standard.\n\nI think the spec _should_ define its support for nested queries, even if it's to say they're not supported.  I also think that it should support index queries.\n\nHowever, I recognize that it says _nothing at all_ in regard to expressions currently, and I'm on board with getting _something_ in place to cover the things we at least agree on right now so long as it's done in a way to leave the door open to incorporate these other features after we've discussed them further.",
           "createdAt": "2021-05-04T08:00:54Z",
           "updatedAt": "2021-05-04T08:01:28Z"
@@ -2578,6 +2606,13 @@
           "body": "The spec should be well-defined, but also provide extension points -- both for third parties to use and for evolution of the spec itself.\r\n",
           "createdAt": "2021-05-04T08:36:17Z",
           "updatedAt": "2021-05-04T08:36:17Z"
+        },
+        {
+          "author": "glyn",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Allowing non-scalar comparisons in filter expressions leads to some weirdness. For example, the `>` operator is no longer [total](https://en.wikipedia.org/wiki/Total_order).\r\n\r\nBackground: https://github.com/vmware-labs/yaml-jsonpath/issues/31\r\nDetailed example: https://github.com/vmware-labs/yaml-jsonpath/issues/3\r\n\r\nThe JSONPath comparison project has a couple of relevant examples:\r\n* https://cburgmer.github.io/json-path-comparison/results/filter_expression_with_set_wise_comparison_to_scalar.html\r\n* https://cburgmer.github.io/json-path-comparison/results/filter_expression_with_set_wise_comparison_to_set.html\r\n\r\nI would prefer the spec to disallow non-scalar comparisons. Christoph Burgmer found a neat way to disallow this in the [grammar of Proposal A](https://github.com/cburgmer/json-path-comparison/tree/master/proposals/Proposal_A#grammar).",
+          "createdAt": "2021-05-11T11:05:57Z",
+          "updatedAt": "2021-05-11T11:05:57Z"
         }
       ]
     },
@@ -3791,7 +3826,7 @@
       "labels": [],
       "body": "Clusters of terms:\r\n\r\n* Cluster 1\r\n\r\n  * JSON value\r\n  * (data) item\r\n  * node\r\n  * location\r\n\r\n  These are related, but different.  We probably do not need all four.\r\n  (Of course, JSON value is a 8259 term, so it does not go away.)\r\n  We should decide which of these terms we want to use, and what they exactly mean.\r\n  A node seems to be a combination of a discrete JSON value and its location.\r\n  JSON value seems to imply equivalence by value (even though equivalence is undefined in RFC 8259),\r\n  while node is based on equivalence by identity.\r\n  Location seems to imply that you can get to the node (and thus the value) from it.\r\n\r\n* Cluster 2\r\n\r\n  * Argument: input to executing JSON query\r\n  * root value, root node (used as Argument, may be used in nested queries)\r\n  * current node (current item):\r\n    * input to selector function invocation, \r\n    * maybe used inside filtering/indexing selectors\r\n\r\n* Cluster 3\r\n\r\n  * selector (part of the selector chain that makes up a JSONPath query)\r\n  * (we probably need a word for) selector function \\[invocation]\r\n\r\n    This is needed if we stick to the model that each node in the\r\n    input node list is treated separately and the results are then\r\n    combined using (TBD) combine1.\r\n\r\n  * combine1 (placeholder for what combines the outputs of the selector function invocations)\r\n\r\n    This becomes important when we either resolve there is only one\r\n    combine1 function or we resolve that combine1 functions are\r\n    (within limits) implemenation specific (i.e., we give up) or that\r\n    different selectors have different combine1 functions.\r\n\r\n  All these can only be meaningfully decided once we have agreement on a processing model.\r\n",
       "createdAt": "2021-03-24T12:38:46Z",
-      "updatedAt": "2021-05-01T00:29:01Z",
+      "updatedAt": "2021-05-11T09:15:41Z",
       "closedAt": null,
       "comments": [
         {
@@ -3873,7 +3908,7 @@
         },
         {
           "author": "gregsdennis",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "body": "> It would help the concision to have a single common term for indexing by name and indexing by index. - @cabo \n\nThis has been brought up before.  To me, `child` is the only sensible term that covers both objects and arrays.  I know there's other discussion regarding this term, but I'm on mobile and can't find it right now.",
           "createdAt": "2021-03-28T19:28:35Z",
           "updatedAt": "2021-03-28T19:28:35Z"
@@ -3887,7 +3922,7 @@
         },
         {
           "author": "gregsdennis",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "body": "> Maybe we need to rename array index so we can use index for the combined term (which also would solve the fact that indexing otherwise isn't always related to indexes).\n\nThis works for me. I tend to think of a thing inside `[]` as an index, whether it's a number or a string (because the `[]` in .Net is called the \"index\" operator).\n\nIt also helps define a union as \"a set of indices\" where a single \"index\" could be a number, a string, a slice, etc. Unions can then be any combination of these things.\n\n(We should also decide on \"indices\" vs \"indexes\". I'm not sure which is more correct. [This](https://grammarist.com/usage/indexes-indices/) seems to indicate there's not a \"correct,\" but we should decide on one or the other.)",
           "createdAt": "2021-03-29T01:54:11Z",
           "updatedAt": "2021-03-29T03:19:22Z"
@@ -3901,7 +3936,7 @@
         },
         {
           "author": "gregsdennis",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "body": "Given those options, I think I'll stick with my vote for \"index\".",
           "createdAt": "2021-03-29T07:43:34Z",
           "updatedAt": "2021-03-29T07:43:34Z"
@@ -3950,7 +3985,7 @@
         },
         {
           "author": "gregsdennis",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "body": "~I still think \"index\" denotes an array specifically.~\n\nThinking over this again, yeah, index/value.  For reasons I've mention above.  (Sorry, typing without thinking)",
           "createdAt": "2021-04-30T06:15:36Z",
           "updatedAt": "2021-04-30T06:23:42Z"
@@ -3964,7 +3999,7 @@
         },
         {
           "author": "gregsdennis",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "body": "\"Indices\" is more correct, but \"indexes\" has become more common recently.\n\nAlso, I still think we should include the `[(<expr>)]`  selector.  I've already explained its uses in other issues, but we should keep it for no other reason than people will complain if it's not supported.",
           "createdAt": "2021-04-30T11:25:44Z",
           "updatedAt": "2021-04-30T11:26:02Z"
@@ -3978,10 +4013,31 @@
         },
         {
           "author": "gregsdennis",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "body": "I would expect that the expression syntax would be the same. The resulting value would need to, instead of being truthy, be able to evaluate to a well-defined index, e.g. a number or string.",
           "createdAt": "2021-05-01T00:29:01Z",
           "updatedAt": "2021-05-01T00:29:01Z"
+        },
+        {
+          "author": "cabo",
+          "authorAssociation": "MEMBER",
+          "body": "\r\n>   * Index selector `'[<index>]'`, where `<index>` is either an (possibly negative) array index or an object member name.\r\n>   * Array slice selector `'[<start>:<end>:<step>]'`, where `<start>`, `<end>`, `<step>` are integer literals.\r\n>   * Union selector `'[<index1>,<index2>,...,<indexN>]'`, holding a comma delimited list of indices (indexes ?).\r\n\r\nI think we should summarize all the above kinds of selector into \"indexing selectors\".\r\n(Note that the wild card selector is not there, as there is no indexing key.)",
+          "createdAt": "2021-05-11T08:39:58Z",
+          "updatedAt": "2021-05-11T08:39:58Z"
+        },
+        {
+          "author": "mkmik",
+          "authorAssociation": "COLLABORATOR",
+          "body": "The current draft says:\r\n> union-element =/ array-index / array-slice\r\n\r\nThus a an indexing expression can include multiple slice expressions:\r\n\r\n```\r\n[<start1>:<end1>:<step1>,<start2>:<end2>:<step2>]\r\n```",
+          "createdAt": "2021-05-11T09:14:17Z",
+          "updatedAt": "2021-05-11T09:14:34Z"
+        },
+        {
+          "author": "cabo",
+          "authorAssociation": "MEMBER",
+          "body": "We may want to adjust that after agreeing on a term",
+          "createdAt": "2021-05-11T09:15:41Z",
+          "updatedAt": "2021-05-11T09:15:41Z"
         }
       ]
     },
@@ -4369,6 +4425,46 @@
           "body": "Just listing this here as yet another example of a JSON technology using external data within its format.  This bolsters the argument for us to have similar functionality, which I'm proposing for `[()]`.\n\n[JSON Logic](https://gregsdennis.github.io/json-everything/usage/json-logic.html#the-syntax) supports a `var` operator that can pull values from the input data.",
           "createdAt": "2021-03-31T19:16:37Z",
           "updatedAt": "2021-03-31T19:16:37Z"
+        }
+      ]
+    },
+    {
+      "number": 95,
+      "id": "MDU6SXNzdWU4ODg3MTAxMjc=",
+      "title": "ER - Provide syntax for returning a specific number of filtered elements",
+      "url": "https://github.com/ietf-wg-jsonpath/draft-ietf-jsonpath-base/issues/95",
+      "state": "OPEN",
+      "author": "mkredpoint",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "A gentleman by the username of gregsdennis on Stack Overflow suggested I raise this issue here for consideration into the specification:\r\n\r\nhttps://stackoverflow.com/questions/67477431/json-path-is-there-a-way-to-only-return-a-specific-number-of-filtered-elements/67477600\r\n\r\nGiven an object like this:\r\n\r\n`    { \"store\": {\r\n    \"book\": [ \r\n      { \"category\": \"reference\",\r\n        \"author\": \"Nigel Rees\",\r\n        \"title\": \"Sayings of the Century\",\r\n        \"price\": 8.95\r\n      },\r\n      { \"category\": \"fiction\",\r\n        \"author\": \"Evelyn Waugh\",\r\n        \"title\": \"Sword of Honour\",\r\n        \"price\": 12.99\r\n      },\r\n      { \"category\": \"fiction\",\r\n        \"author\": \"Herman Melville\",\r\n        \"title\": \"Moby Dick\",\r\n        \"isbn\": \"0-553-21311-3\",\r\n        \"price\": 8.99\r\n      },\r\n      { \"category\": \"fiction\",\r\n        \"author\": \"J. R. R. Tolkien\",\r\n        \"title\": \"The Lord of the Rings\",\r\n        \"isbn\": \"0-395-19395-8\",\r\n        \"price\": 22.99\r\n      }\r\n    ],\r\n    \"bicycle\": {\r\n      \"color\": \"red\",\r\n      \"price\": 19.95\r\n    }\r\n  }\r\n}`\r\n\r\nand running a JSON path expression like so:\r\n\r\n`$..book[?(@.price<10)]`\r\n\r\nWill return 2 objects:\r\n\r\n`[\r\n   {\r\n      \"category\" : \"reference\",\r\n      \"author\" : \"Nigel Rees\",\r\n      \"title\" : \"Sayings of the Century\",\r\n      \"price\" : 8.95\r\n   },\r\n   {\r\n      \"category\" : \"fiction\",\r\n      \"author\" : \"Herman Melville\",\r\n      \"title\" : \"Moby Dick\",\r\n      \"isbn\" : \"0-553-21311-3\",\r\n      \"price\" : 8.99\r\n   }\r\n]`\r\n\r\nit would be great if JSON Path also provide syntax for returning the first or last 'n' items of the filtered array\r\n\r\ne.g. if I only wanted maximum 1 item from the result of the filtering operation:\r\n\r\n`$..book[?(@.price<10)]{1}`\r\n\r\n",
+      "createdAt": "2021-05-11T21:23:25Z",
+      "updatedAt": "2021-05-11T21:23:25Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 96,
+      "id": "MDU6SXNzdWU4ODk4NDE0NTM=",
+      "title": "XPath references and comparisons",
+      "url": "https://github.com/ietf-wg-jsonpath/draft-ietf-jsonpath-base/issues/96",
+      "state": "OPEN",
+      "author": "gregsdennis",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "How much do we want to reference XPath within the spec?  I understand that XPath is the inspiration (and in the tagline that @goessner used in his blog post: \"XPath for JSON\"), but I wonder if much of this can be left out of the spec.\r\n\r\nThe argument for this is that we're defining JSONPath.  It shouldn't assume any understanding of XPath or any other technology.  It's not the job of the specification to convince readers to use it.  It's the job of the specification to _define_ the technology.\r\n\r\nI'm perfectly happy moving this into an external \"Understanding JSONPath\" website at some point.",
+      "createdAt": "2021-05-12T08:53:07Z",
+      "updatedAt": "2021-05-12T08:55:03Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "cabo",
+          "authorAssociation": "MEMBER",
+          "body": "I seem to remember that last time we discussed this we agreed to move the introductory comparison with XPath to an appendix, with the possible exception of the overview table (but that could be duplicated).",
+          "createdAt": "2021-05-12T08:55:03Z",
+          "updatedAt": "2021-05-12T08:55:03Z"
         }
       ]
     }
@@ -13470,6 +13566,129 @@
         }
       ],
       "reviews": []
+    },
+    {
+      "number": 94,
+      "id": "MDExOlB1bGxSZXF1ZXN0NjQwMTYzNDEw",
+      "title": "removed dashes `-` as valid characters for dot-name selectors",
+      "url": "https://github.com/ietf-wg-jsonpath/draft-ietf-jsonpath-base/pull/94",
+      "state": "OPEN",
+      "author": "gregsdennis",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Resolves #16\r\n\r\nAlso, I'm not sure what needs to be included in the PR as far as generated files go.  Any guidance would be helpful.",
+      "createdAt": "2021-05-11T11:05:50Z",
+      "updatedAt": "2021-05-11T11:15:47Z",
+      "baseRepository": "ietf-wg-jsonpath/draft-ietf-jsonpath-base",
+      "baseRefName": "main",
+      "baseRefOid": "c8597e87e9735338ceca4eb6a99c15bf5148dcf2",
+      "headRepository": "gregsdennis/draft-ietf-jsonpath-base",
+      "headRefName": "main",
+      "headRefOid": "d40c4c8616cb75100d73bf1708bec4416f655603",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "glyn",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> Also, I'm not sure what needs to be included in the PR as far as generated files go. Any guidance would be helpful.\r\n\r\nIIRC (and it's a big if given how long ago I made a change), you don't need to check in generated files. Indeed `.gitignore` ignores them.",
+          "createdAt": "2021-05-11T11:14:41Z",
+          "updatedAt": "2021-05-11T11:14:41Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NjU2NTgwMzg1",
+          "commit": {
+            "abbreviatedOid": "d40c4c8"
+          },
+          "author": "mkmik",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2021-05-11T11:15:47Z",
+          "updatedAt": "2021-05-11T11:15:47Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 97,
+      "id": "MDExOlB1bGxSZXF1ZXN0NjQzMDQ3NjA1",
+      "title": "84 terminology",
+      "url": "https://github.com/ietf-wg-jsonpath/draft-ietf-jsonpath-base/pull/97",
+      "state": "OPEN",
+      "author": "gregsdennis",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Resolves #84\r\n\r\n## Alterations\r\n\r\n- Removed `Value`, `Object`, and `Array` since they are defined in 8259.  Replaced with extended verbiage at the beginning of the section that declares that 8259 applies.\r\n- Replaced \"JSON value\" with \"value\" in line with the above.\r\n\r\n## Additions\r\n\r\n- Root Node\r\n\r\n## Other\r\n\r\n- Reordered terms and paragraphs so that reading through doesn't use terms that haven't been defined yet (as much as possible).\r\n- Removed a redundant parenthetical sentence in the *Processing Model* section.\r\n- Removed some un-necessary self-references (e.g. \"JSONPath query\" rather than just \"query\").\r\n- Made some general edits\r\n\r\n## Notes\r\n\r\n### Existing in-place definitions\r\n\r\n\"Selector\" and \"slice\" are defined in-place where they're needed.  Do we need to define them in the terminology section as well?\r\n\r\n### Key\r\n\r\nThe draft currently uses \"name\" instead of \"key\" as we had agreed in the meeting.  I suspect that this is because 8259 uses \"name.\"  Since we're trying to align with that, I've left in \"name.\"\r\n\r\n### Index\r\n\r\nWe discussed using \"index\" as a generic term for either a numeric index for arrays or a name for objects.  However in editing this section, I'm starting to second-guess that decision.\r\n\r\nGiven that we've opted to define a union selector as taking as arguments \"indices,\" \"slices,\" and/or \"filters,\" I don't think it's too much of a stretch to separately include \"indexes\" and \"names.\"  Because of this, I left the definition of \"index\" as is.\r\n\r\nThis also addresses the tendency to associate \"index\" with arrays, as @glyn had mentioned.\r\n\r\nI'm leaving the changes to \"union selector\" to include all of the various things it can accept for another PR as this is solely to clean up terminology.\r\n\r\n### Emphasizing terms\r\n\r\nI tried capitalizing defined terms to emphasize their special meaning.  It got weird to read, though, since they're used so frequently.  Maybe not _every_ instance of the terms needs to be emphasized.  I'm not sure.  Happy to discuss.\r\n\r\nI've left this change out for now, but there are definitely inconsistencies present already.\r\n",
+      "createdAt": "2021-05-12T10:40:26Z",
+      "updatedAt": "2021-05-12T13:51:13Z",
+      "baseRepository": "ietf-wg-jsonpath/draft-ietf-jsonpath-base",
+      "baseRefName": "main",
+      "baseRefOid": "c8597e87e9735338ceca4eb6a99c15bf5148dcf2",
+      "headRepository": "ietf-wg-jsonpath/draft-ietf-jsonpath-base",
+      "headRefName": "84-terminology",
+      "headRefOid": "892a3ccb78153eb496f814d1fd7d6c88810d2269",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "cabo",
+          "authorAssociation": "MEMBER",
+          "body": "> Resolves #84\r\n> \r\n> ## Alterations\r\n> * Removed `Value`, `Object`, and `Array` since they are defined in 8259.  Replaced with extended verbiage at the beginning of the section that declares that 8259 applies.\r\n> * Replaced \"JSON value\" with \"value\" in line with the above.\r\n\r\nNot good.\r\n\r\nIs there a reason you want to cause this regression?\r\n\r\nGr\u00fc\u00dfe, Carsten\r\n",
+          "createdAt": "2021-05-12T13:51:13Z",
+          "updatedAt": "2021-05-12T13:51:13Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NjU3OTA2MTA1",
+          "commit": {
+            "abbreviatedOid": "892a3cc"
+          },
+          "author": "glyn",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2021-05-12T13:45:44Z",
+          "updatedAt": "2021-05-12T13:45:45Z",
+          "comments": [
+            {
+              "originalPosition": 44,
+              "body": "```suggestion\r\n: A name/value pair in an object.  (Not itself a value.)\r\n```",
+              "createdAt": "2021-05-12T13:45:45Z",
+              "updatedAt": "2021-05-12T13:46:24Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NjU3OTExMjE4",
+          "commit": {
+            "abbreviatedOid": "892a3cc"
+          },
+          "author": "glyn",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2021-05-12T13:49:57Z",
+          "updatedAt": "2021-05-12T13:49:57Z",
+          "comments": [
+            {
+              "originalPosition": 60,
+              "body": "It would be good to delete this parenthetical remark if/when XML is relegated to an appendix (which could then use \"XML element\" instead).",
+              "createdAt": "2021-05-12T13:49:57Z",
+              "updatedAt": "2021-05-12T13:49:57Z"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
