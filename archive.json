@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2021-05-13T01:09:35.738157+00:00",
+  "timestamp": "2021-05-16T01:15:15.344387+00:00",
   "repo": "ietf-wg-jsonpath/draft-ietf-jsonpath-base",
   "labels": [
     {
@@ -1904,7 +1904,7 @@
       "labels": [],
       "body": "**Proposal**: JSONPath should have support to relative paths (to a current context), so it can be used as a building block for more advanced usages. \r\n\r\nXPath makes a clear distinction between relative and absolute paths, e.g.:\r\n\r\ngiven the following XML input:\r\n```xml\r\n<root>\r\n    <e>foo</e>\r\n    <a>\r\n        <b>\r\n            <c><d>1</d><e>bar1</e></c>\r\n            <c><d>2</d><e>bar2</e></c>\r\n            <c><d>3</d><e>bar3</e></c>\r\n        </b>\r\n    </a>\r\n</root>\r\n```\r\n\r\nand the following template, which uses the relative XPath `d` and the absolute XPath `/root/e`:\r\n\r\n```xml\r\n<?xml version=\"1.0\"?>\r\n<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"1.0\">\r\n    <xsl:template match=\"/\">\r\n        <x>\r\n            <xsl:for-each select=\"root/a/b/c\">\r\n                <item>\r\n                    <y><xsl:value-of select=\"d\"/></y>\r\n                    <z><xsl:value-of select=\"/root/e\"/></z>\r\n                </item>\r\n            </xsl:for-each>\r\n        </x>\r\n    </xsl:template>\r\n</xsl:stylesheet>\r\n```\r\n\r\nthe following XML can be produced:\r\n```xml\r\n<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<x>\r\n    <item>\r\n        <y>1</y>\r\n        <z>foo</z>\r\n    </item>\r\n    <item>\r\n        <y>2</y>\r\n        <z>foo</z>\r\n    </item>\r\n    <item>\r\n        <y>3</y>\r\n        <z>foo</z>\r\n    </item>\r\n</x>\r\n```\r\n\r\nI think that in a similar fashion JSONPath should allow relative paths as a building feature for more advanced usages.\r\n\r\n*Remark: I acknowledge that templating/transforms are out of scope here, however I believe that we must consider enabling more advanced usages.* \r\n\r\n**Suggested implementation**: JSONPath spec should mention that `$` is always the document root, while any JSONPath which doesn't start with '$' is relative to the current context.\r\nThis wouldn't change the behavior for several existing implementations since they can assume that current context == document root.\r\n**Additional note**: There is also a number of implementations for which a JSONPath without starting `$` always evaluates to `[]`, given the previous definition we can state that their current context is always set to `null`, therefore this change would allow both as valid JSONPath spec implementations.",
       "createdAt": "2021-03-09T14:48:45Z",
-      "updatedAt": "2021-05-04T17:37:49Z",
+      "updatedAt": "2021-05-14T22:57:10Z",
       "closedAt": null,
       "comments": [
         {
@@ -1930,7 +1930,7 @@
         },
         {
           "author": "gregsdennis",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "body": "I think we need to shelve this concept until after we have a first version out.  As @bettio mentions, this is an advanced usage, but we can't even start to consider such things until we've defined basic usage.",
           "createdAt": "2021-03-10T18:52:11Z",
           "updatedAt": "2021-03-10T18:52:11Z"
@@ -1944,7 +1944,7 @@
         },
         {
           "author": "gregsdennis",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "body": "Okay I think I'm starting to understand what you want, @bettio.  But please know that I'm coming at this with no knowledge on XPath except what you've described, so please bear with me.\n\nBased on your example, XPath appears to be hierarchical in its declaration.  Each level declares its own set of selectors. Because of this, yes, it's important that XPath support relative (acts on the currently-processed location) and absolute (acts on the root of the initial data argument) selection patterns.\n\nJSON Path distinguishes between these using the `@` (current location) and `$` (root) operators.\n\nIt also appears that it's building a new XML object in the form in line with the structure of the XPath query.  This is describing transformation, which is where JSON Path and XPath deviate.\n\nJSON Path does not build a new JSON value.  It is only intended for finding data, not constructing new values from that data.  XPath is doing both of these things at the same time.\n\nI think this is where the \"XPath for JSON\" slogan breaks down, as has been discussed in #65.",
           "createdAt": "2021-03-11T18:57:28Z",
           "updatedAt": "2021-03-11T19:00:14Z"
@@ -1958,7 +1958,7 @@
         },
         {
           "author": "gregsdennis",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "body": "Thank you for the detailed summary and explanation.\n\nLooking at your example of what you expect to happen at the end of your comment, this is precisely what the current syntax does _within the context of evaluation_.\n\nHowever, `@` is not valid at the beginning of a standalone path.  It seems this is what you're asking for.\n\n_As an aside, I think there's a further deviation between [proper JSON](https://www.json.org/) ([spec](https://tools.ietf.org/html/rfc7159)) and XML in that JSON doesn't have the idea of a top-level document.  Because of this, tooling can just pass whatever current JSON value it has to a proper path evaluator to get the required output.  This is the current state of things, which is what we're actively trying to define at this time._\n\nHowever, I can see the benefit of allowing a path to start with `@` to indicate to such tooling which JSON value.  I believe some implementations support this as well (to be verified).  Basically your XML example from earlier in a hypothetical JSONT could be\n\n```\n\u200b{\n  \"for-each\u200b\": {\n   \u00a0\u200b\"select\": \"\u200b$.a.b.c\u200b\"\u200b,\n    \"item\u200b\": {\n\u00a0\u00a0\u00a0\u00a0  \"y\u200b\": \"@.\u200bd\u200b\",\n\u00a0\u00a0\u00a0\u00a0  \"z\u200b\": \"$.e\u200b\"\u200b\n    }\n  }\n}\n```\n\nThe difference between `@.d` and `$.e` becomes immediately apparent and is more of a cue to the JSONT implementation (which knows the difference between the JSON value it was given and the current JSON value) than the JSON Path evaluator.\n\nBut this only works if the JSON Path evaluator allows starting a path with `@`.  So that's your proposal.\n\n---\n\nProposal: allow paths to start with `@`.  It operates no differently than `$`, but can serve as an important indicator to tooling and other systems that consume JSON Path.\n\nMoreover, I believe it would help define such paths when defined within filter expressions. (See #17 & #64.)",
           "createdAt": "2021-03-12T03:39:05Z",
           "updatedAt": "2021-03-13T09:59:21Z"
@@ -1979,7 +1979,7 @@
         },
         {
           "author": "gregsdennis",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "body": "@danielaparker, @bettio isn't asking for JSON Path to provide transformations.  He's asking for JSON Path to allow `@` at the beginning of a path so that, separately, other tooling can _use_ JSON Path.  Transformations are just an example of such tooling that could take advantage of this.\n\nIt's opening a door for others, that's all.\n\nPlease see my proposal rephrase at the end of [my comment](https://github.com/ietf-wg-jsonpath/draft-ietf-jsonpath-jsonpath/issues/59#issuecomment-797212814).",
           "createdAt": "2021-03-12T19:46:41Z",
           "updatedAt": "2021-03-12T19:48:16Z"
@@ -2000,7 +2000,7 @@
         },
         {
           "author": "gregsdennis",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "body": "How so? It's not removing any functionality of existing implementations, and it actually helps define some things in expression evaluation.",
           "createdAt": "2021-03-16T19:23:18Z",
           "updatedAt": "2021-03-16T19:23:18Z"
@@ -2154,7 +2154,7 @@
         },
         {
           "author": "gregsdennis",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "body": "I still firmly support this.",
           "createdAt": "2021-03-29T18:44:13Z",
           "updatedAt": "2021-03-29T18:44:13Z"
@@ -2172,6 +2172,20 @@
           "body": "> No new activity in last month.\r\n> @glyn are you willing to compute consensus based on the whole discussion?\r\n\r\nNo, I'll leave that to the Chairs, thanks.",
           "createdAt": "2021-05-04T17:37:49Z",
           "updatedAt": "2021-05-04T17:37:49Z"
+        },
+        {
+          "author": "bettio",
+          "authorAssociation": "NONE",
+          "body": "Any news?",
+          "createdAt": "2021-05-13T08:04:14Z",
+          "updatedAt": "2021-05-13T08:04:14Z"
+        },
+        {
+          "author": "fiestajetsam",
+          "authorAssociation": "MEMBER",
+          "body": "@bettio the consensus that was made during the meeting on Tuesday ([minutes here](https://datatracker.ietf.org/doc/minutes-interim-2021-jsonpath-01-202105110900/)) was that at this stage we won't include relative path support as it's been described in this PR. Several points already mentioned in this issue were re-iterated in the meeting such as charter scope, and percentage of existing deployments.\r\n\r\nIf you continue to feel strongly for it the two options are either providing a further case for its inclusion into the base specification, or consider this work as an extension - a key action that was set at the meeting was for JSONPath to have an extension model in place, and this seems like an obvious candidate.",
+          "createdAt": "2021-05-14T22:57:10Z",
+          "updatedAt": "2021-05-14T22:57:10Z"
         }
       ]
     },
@@ -13579,7 +13593,7 @@
       "labels": [],
       "body": "Resolves #16\r\n\r\nAlso, I'm not sure what needs to be included in the PR as far as generated files go.  Any guidance would be helpful.",
       "createdAt": "2021-05-11T11:05:50Z",
-      "updatedAt": "2021-05-11T11:15:47Z",
+      "updatedAt": "2021-05-16T00:37:37Z",
       "baseRepository": "ietf-wg-jsonpath/draft-ietf-jsonpath-base",
       "baseRefName": "main",
       "baseRefOid": "c8597e87e9735338ceca4eb6a99c15bf5148dcf2",
@@ -13625,15 +13639,15 @@
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
-      "body": "Resolves #84\r\n\r\n## Alterations\r\n\r\n- Removed `Value`, `Object`, and `Array` since they are defined in 8259.  Replaced with extended verbiage at the beginning of the section that declares that 8259 applies.\r\n- Replaced \"JSON value\" with \"value\" in line with the above.\r\n\r\n## Additions\r\n\r\n- Root Node\r\n\r\n## Other\r\n\r\n- Reordered terms and paragraphs so that reading through doesn't use terms that haven't been defined yet (as much as possible).\r\n- Removed a redundant parenthetical sentence in the *Processing Model* section.\r\n- Removed some un-necessary self-references (e.g. \"JSONPath query\" rather than just \"query\").\r\n- Made some general edits\r\n\r\n## Notes\r\n\r\n### Existing in-place definitions\r\n\r\n\"Selector\" and \"slice\" are defined in-place where they're needed.  Do we need to define them in the terminology section as well?\r\n\r\n### Key\r\n\r\nThe draft currently uses \"name\" instead of \"key\" as we had agreed in the meeting.  I suspect that this is because 8259 uses \"name.\"  Since we're trying to align with that, I've left in \"name.\"\r\n\r\n### Index\r\n\r\nWe discussed using \"index\" as a generic term for either a numeric index for arrays or a name for objects.  However in editing this section, I'm starting to second-guess that decision.\r\n\r\nGiven that we've opted to define a union selector as taking as arguments \"indices,\" \"slices,\" and/or \"filters,\" I don't think it's too much of a stretch to separately include \"indexes\" and \"names.\"  Because of this, I left the definition of \"index\" as is.\r\n\r\nThis also addresses the tendency to associate \"index\" with arrays, as @glyn had mentioned.\r\n\r\nI'm leaving the changes to \"union selector\" to include all of the various things it can accept for another PR as this is solely to clean up terminology.\r\n\r\n### Emphasizing terms\r\n\r\nI tried capitalizing defined terms to emphasize their special meaning.  It got weird to read, though, since they're used so frequently.  Maybe not _every_ instance of the terms needs to be emphasized.  I'm not sure.  Happy to discuss.\r\n\r\nI've left this change out for now, but there are definitely inconsistencies present already.\r\n",
+      "body": "Resolves #84\r\n\r\n## Alterations\r\n\r\n- Removed `Value`, `Object`, and `Array` since they are defined in 8259.  Replaced with extended verbiage at the beginning of the section that declares that 8259 applies.\r\n- Replaced \"JSON value\" with \"value\" in line with the above.\r\n\r\n## Additions\r\n\r\n- Root Node\r\n\r\n## Other\r\n\r\n- Reordered terms and paragraphs so that reading through doesn't use terms that haven't been defined yet (as much as possible).\r\n- Removed a redundant parenthetical sentence in the *Processing Model* section.\r\n- Removed some un-necessary self-references (e.g. \"JSONPath query\" rather than just \"query\").\r\n- Made some general edits\r\n\r\n## Notes\r\n\r\n### Existing in-place definitions\r\n\r\n\"Selector\" and \"slice\" are defined in-place where they're needed.  Do we need to define them in the terminology section as well?\r\n\r\n### Key\r\n\r\nThe draft currently uses \"name\" instead of \"key\" as we had agreed in the meeting.  I suspect that this is because 8259 uses \"name.\"  Since we're trying to align with that, I've left in \"name.\"\r\n\r\n### Index\r\n\r\nWe discussed using \"index\" as a generic term for either a numeric index for arrays or a name for objects.  However in editing this section, I'm starting to second-guess that decision.\r\n\r\nGiven that we've opted to define a union selector as taking as arguments \"indices,\" \"slices,\" and/or \"filters,\" I don't think it's too much of a stretch to separately include \"indices\" and \"names.\"  Because of this, I left the definition of \"index\" as is.\r\n\r\nThis also addresses the tendency to associate \"index\" with arrays, as @glyn had mentioned.\r\n\r\nI'm leaving the changes to \"union selector\" to include all of the various things it can accept for another PR as this is solely to clean up terminology.\r\n\r\n### Emphasizing terms\r\n\r\nI tried capitalizing defined terms to emphasize their special meaning.  It got weird to read, though, since they're used so frequently.  Maybe not _every_ instance of the terms needs to be emphasized.  I'm not sure.  Happy to discuss.\r\n\r\nI've left this change out for now, but there are definitely inconsistencies present already.\r\n",
       "createdAt": "2021-05-12T10:40:26Z",
-      "updatedAt": "2021-05-12T13:51:13Z",
+      "updatedAt": "2021-05-15T07:25:41Z",
       "baseRepository": "ietf-wg-jsonpath/draft-ietf-jsonpath-base",
       "baseRefName": "main",
       "baseRefOid": "c8597e87e9735338ceca4eb6a99c15bf5148dcf2",
       "headRepository": "ietf-wg-jsonpath/draft-ietf-jsonpath-base",
       "headRefName": "84-terminology",
-      "headRefOid": "892a3ccb78153eb496f814d1fd7d6c88810d2269",
+      "headRefOid": "b9a84834b1b1335d1a4c9b98c682213017bc8e49",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -13645,6 +13659,69 @@
           "body": "> Resolves #84\r\n> \r\n> ## Alterations\r\n> * Removed `Value`, `Object`, and `Array` since they are defined in 8259.  Replaced with extended verbiage at the beginning of the section that declares that 8259 applies.\r\n> * Replaced \"JSON value\" with \"value\" in line with the above.\r\n\r\nNot good.\r\n\r\nIs there a reason you want to cause this regression?\r\n\r\nGr\u00fc\u00dfe, Carsten\r\n",
           "createdAt": "2021-05-12T13:51:13Z",
           "updatedAt": "2021-05-12T13:51:13Z"
+        },
+        {
+          "author": "gregsdennis",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> Is there a reason you want to cause this regression?\n\nIs it a regression?  The spec already had text that it pulled these terms from 8259 and that we don't consider them in terms of their general programming usages.  It's redundant to define them again.\n\nI think it makes sense to claim these terms as defined the same way.  We don't redefine \"MUST\" _et. al._, we claim them from 2119.",
+          "createdAt": "2021-05-13T04:44:12Z",
+          "updatedAt": "2021-05-13T04:44:12Z"
+        },
+        {
+          "author": "cabo",
+          "authorAssociation": "MEMBER",
+          "body": "> > Is there a reason you want to cause this regression?\r\n> \r\n> Is it a regression? The spec already had text that it pulled these terms from 8259 and that we don't consider them in terms of their general programming usages. It's redundant to define them again.\r\n> \r\n> I think it makes sense to claim these terms as defined the same way. We don't redefine \"MUST\" _et. al._, we claim them from 2119.\r\n\r\nThe current text does point to 8259 and doesn't redefine terms.  Where 8259 defines \"bed\" as \"table\", this is mentioned and possibly detailed once more, which I think is needed for readers who aren't totally immersed in 8259's terminology.\r\nWhy do you want to make it harder to use the specification?\r\n\r\n(Geez, have you ever actually read 8259?  It doesn't actually define the terms.)\r\n\r\nCrystallizing the definitions for use in JSONpath serves a purpose.\r\n\r\nWhy do you think it is detrimental to remind readers that object does not have the English meaning in this document?\r\n\r\nI'd rather spend time on constructive PRs.\r\n\r\nGr\u00fc\u00dfe, Carsten\r\n",
+          "createdAt": "2021-05-13T05:43:48Z",
+          "updatedAt": "2021-05-13T05:43:48Z"
+        },
+        {
+          "author": "gregsdennis",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> Where 8259 defines \"bed\" as \"table\"... \n\nI think we have a confusion.  When I say \"8259\", mean [this RFC](https://datatracker.ietf.org/doc/html/rfc8259) (also denoted by `{{-json}}` in the raw text) which is what it appears the spec is referencing. It doesn't even _contain_ the word \"bed\".  So I have no idea what you're talking about.\n\nThat spec very clearly defines all of the terms that I've removed.\n\n> Crystallizing the definitions for use in JSONpath serves a purpose.\n\nMy concern is redefinition.  It doesn't make sense to define it in two places.  The common practice (as I've seen) is to refer to existing definitions.  Since we're relying heavily on the definition of JSON anyway, it makes sense to just reference those definitions.  Anyone unfamiliar with JSON should want to read that spec as well.\n\n> Why do you think it is detrimental to remind readers that object does not have the English meaning in this document?\n\nI _do_ keep the callout that we're not using the English meaning of \"object\" and \"array.\" I've just moved it up to the text where I claim the definitions from the JSON spec.",
+          "createdAt": "2021-05-13T20:08:01Z",
+          "updatedAt": "2021-05-13T20:08:01Z"
+        },
+        {
+          "author": "cabo",
+          "authorAssociation": "MEMBER",
+          "body": "On 13. May 2021, at 22:08, Greg Dennis ***@***.***> wrote:\n> \n> Where 8259 defines \"bed\" as \"table\"...\n> \n> I think we have a confusion.\n> \n\nYes.  It just didn\u2019t occur to me that this cultural reference may be completely obvious to Germans but almost inaccessible to people from other native languages.\n\nHere are references to the short story that should be mandatory reading for anyone working on terminology (or, actually, anyone communicating).\n(Germans tend to encounter it in school, at around 8th grade.)\n\nhttps://www.deutschunddeutlich.de/contentLD/GD/GT67cTischistTisch.pdf\nhttp://www.barbarafaessler.com/files/BichselAtableisatable.pdf (English translation of unknown quality)\n\nGr\u00fc\u00dfe, Carsten\n\n",
+          "createdAt": "2021-05-13T22:07:14Z",
+          "updatedAt": "2021-05-13T22:07:14Z"
+        },
+        {
+          "author": "gregsdennis",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Interesting story, but I don't really get your purpose in referencing it.  We're not swapping terms between our spec and 8259.",
+          "createdAt": "2021-05-14T06:04:31Z",
+          "updatedAt": "2021-05-14T06:04:31Z"
+        },
+        {
+          "author": "goessner",
+          "authorAssociation": "COLLABORATOR",
+          "body": "just to let you know ... I won't be active until Wednesday next week ...\n\nCheers\n--\nsg\n",
+          "createdAt": "2021-05-14T06:17:13Z",
+          "updatedAt": "2021-05-14T06:17:13Z"
+        },
+        {
+          "author": "glyn",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I find the definitions in 8259 rather confusing. Take _object_ for example. 8259 contains the following statements:\r\n1. A JSON text is a serialized value.\r\n2. `JSON-text = ws value ws`\r\n3. A JSON value MUST be an object, array, number, or string, or one of the following three literal names: [...]\r\n4. An object structure is represented as a pair of curly brackets surrounding zero or more name/value pairs (or members).\r\n\r\nOne way to read statement 1 is that a value is serlalized to produce JSON text and therefore a value is not itself in serial form. But statement 2 seems to imply that a value _is_ in serial form. So I think statement 1 has to be read as \"A JSON text is a value in a serialized form.\"\r\n\r\nIf a value is in a serialized form, then statement 3 implies that an object is also in a serialized form.\r\n\r\nBut statement 4 is then confusing:\r\n* It seems to be defining an object structure rather than an object.\r\n* It's probably trying to define an object and say that an object is a structure (in the normal use of the word).\r\n* It says an object (structure) \"_is represented as_ a pair of curly brackets [...]\", but if an object is a serialized thing, it _is_ a pair of curly brackets etc. (Or, perhaps better, an object _consists of_ a pair of curly brackets etc.)\r\n\r\nI'm not sure whether we should attempt to clarify this in the JSONPath spec or submit an erratum to 8259 - probably the latter makes more sense.\r\n",
+          "createdAt": "2021-05-15T06:24:07Z",
+          "updatedAt": "2021-05-15T06:24:07Z"
+        },
+        {
+          "author": "cabo",
+          "authorAssociation": "MEMBER",
+          "body": "8259 is what it is.  It was created in a politically difficult situation, and it turned out better than many of us had feared.  But it is a rather poor document, and the errata process is not designed to fix its problems.\r\n\r\nBut the situation is actually worse.  When writing the JSONpath specification, we have to think about its audience and not about how we ourselves would like this document to be.  Most people who will read the JSONpath specification will come out of one of the JSON sub-ecosystems and will think that they know what JSON is.  They won't read 8259 just because we reference it.  It simply is not helpful to defer to 8259, we have to make sure that the terms we need are introduced properly.  (Not *defined* -- that is indeed what 8259 needs to be the authoritative reference for.). This is more important because the 8259 terminology is peculiar (its accidental or deliberate ambiguities served its purpose well in the painstaking 8259 process, but that doesn't mean it's particularly good for specifications that actually make use of JSON).\r\n\r\nI wish we could focus on creating a good document for its audience, instead of discussing whether something theoretically needs to be brought up or not.\r\n",
+          "createdAt": "2021-05-15T07:05:20Z",
+          "updatedAt": "2021-05-15T07:05:20Z"
+        },
+        {
+          "author": "gregsdennis",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@cabo that was well-stated.  I will try to make another round of edits to reinsert these in such a way that clarity is provided without redefining them.",
+          "createdAt": "2021-05-15T07:25:40Z",
+          "updatedAt": "2021-05-15T07:25:40Z"
         }
       ],
       "reviews": [
@@ -13685,6 +13762,226 @@
               "body": "It would be good to delete this parenthetical remark if/when XML is relegated to an appendix (which could then use \"XML element\" instead).",
               "createdAt": "2021-05-12T13:49:57Z",
               "updatedAt": "2021-05-12T13:49:57Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NjU4NTc5NzEx",
+          "commit": {
+            "abbreviatedOid": "b9a8483"
+          },
+          "author": "gregsdennis",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2021-05-13T04:45:30Z",
+          "updatedAt": "2021-05-13T04:45:31Z",
+          "comments": [
+            {
+              "originalPosition": 60,
+              "body": "Will leave for a follow-up PR.  (Ref #96)",
+              "createdAt": "2021-05-13T04:45:31Z",
+              "updatedAt": "2021-05-13T04:46:06Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NjU4NjA4NTQ0",
+          "commit": {
+            "abbreviatedOid": "722eb58"
+          },
+          "author": "cabo",
+          "authorAssociation": "MEMBER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2021-05-13T05:56:50Z",
+          "updatedAt": "2021-05-13T05:56:51Z",
+          "comments": [
+            {
+              "originalPosition": 6,
+              "body": "Please indicate where 8259 defines \"string\".",
+              "createdAt": "2021-05-13T05:56:51Z",
+              "updatedAt": "2021-05-13T05:56:51Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NjU4NjEwNjc4",
+          "commit": {
+            "abbreviatedOid": "b5006a2"
+          },
+          "author": "cabo",
+          "authorAssociation": "MEMBER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2021-05-13T06:02:05Z",
+          "updatedAt": "2021-05-13T06:02:05Z",
+          "comments": [
+            {
+              "originalPosition": 48,
+              "body": "The definitional aspect of the Output Path is that it is output.  The fact that it is normalized is certainly interesting, but not definitional.  Normalized paths could occur anywhere.  Output Paths occur at the output.",
+              "createdAt": "2021-05-13T06:02:05Z",
+              "updatedAt": "2021-05-13T06:02:05Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NjU4NjEwOTAy",
+          "commit": {
+            "abbreviatedOid": "b5006a2"
+          },
+          "author": "cabo",
+          "authorAssociation": "MEMBER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2021-05-13T06:02:36Z",
+          "updatedAt": "2021-05-13T06:02:36Z",
+          "comments": [
+            {
+              "originalPosition": 97,
+              "body": "The definition is not a replacement for the exposition in the text.",
+              "createdAt": "2021-05-13T06:02:36Z",
+              "updatedAt": "2021-05-13T06:02:36Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NjU4NjExMTg4",
+          "commit": {
+            "abbreviatedOid": "b5006a2"
+          },
+          "author": "cabo",
+          "authorAssociation": "MEMBER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2021-05-13T06:03:20Z",
+          "updatedAt": "2021-05-13T06:03:21Z",
+          "comments": [
+            {
+              "originalPosition": 114,
+              "body": "We are still in the initial exposition, so redundancy is good here.",
+              "createdAt": "2021-05-13T06:03:20Z",
+              "updatedAt": "2021-05-13T06:03:21Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NjU4NjM2ODg3",
+          "commit": {
+            "abbreviatedOid": "b9a8483"
+          },
+          "author": "gregsdennis",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2021-05-13T06:56:02Z",
+          "updatedAt": "2021-05-13T06:56:03Z",
+          "comments": [
+            {
+              "originalPosition": 6,
+              "body": "https://datatracker.ietf.org/doc/html/rfc8259#section-7",
+              "createdAt": "2021-05-13T06:56:02Z",
+              "updatedAt": "2021-05-13T06:56:03Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NjU4NjQ3NjE3",
+          "commit": {
+            "abbreviatedOid": "b9a8483"
+          },
+          "author": "cabo",
+          "authorAssociation": "MEMBER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2021-05-13T07:14:48Z",
+          "updatedAt": "2021-05-13T07:14:49Z",
+          "comments": [
+            {
+              "originalPosition": 6,
+              "body": "Yes.\r\n\r\n```\r\n   A string begins and ends with\r\n   quotation marks.  All Unicode characters may be placed within the\r\n   quotation marks, except for the characters that MUST be escaped:\r\n   quotation mark, reverse solidus, and the control characters (U+0000\r\n   through U+001F).\r\n```\r\n\r\nThese are not the strings JSONPath uses.",
+              "createdAt": "2021-05-13T07:14:48Z",
+              "updatedAt": "2021-05-13T07:14:49Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NjU4NjQ4NDMz",
+          "commit": {
+            "abbreviatedOid": "b9a8483"
+          },
+          "author": "gregsdennis",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2021-05-13T07:16:12Z",
+          "updatedAt": "2021-05-13T07:16:13Z",
+          "comments": [
+            {
+              "originalPosition": 48,
+              "body": "- `Node` is defined as a value and a location.\r\n- `Nodelist` is defined as a collection of nodes.  The definition also mentions that the output of a query is a nodelist.\r\n- Both the \"Processing Model\" and \"Sematics\" sections also mention that the output is a nodelist.  Moreover, \"Processing Model\" says that each selector produces a nodelist which is then used as the input to the next selector.\r\n\r\nIt seems to me that the output is already well-defined by the above.\r\n\r\nIf we also declare that the location portion of a node needs to be represented with a normalized path, then we get for free that the paths in the output are a normalized path (because the output is a list of nodes), and we don't need to define what an \"output path\" is.\r\n\r\nHowever, \"normalized path\" still needs to be defined.  This is illustrated by your statement:\r\n\r\n> Normalized paths could occur anywhere.\r\n\r\nI don't think we need to have a special-case definition for a path that occurs in the output.",
+              "createdAt": "2021-05-13T07:16:12Z",
+              "updatedAt": "2021-05-13T07:16:13Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NjU4NjQ5NTk3",
+          "commit": {
+            "abbreviatedOid": "b9a8483"
+          },
+          "author": "gregsdennis",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2021-05-13T07:18:05Z",
+          "updatedAt": "2021-05-13T07:18:05Z",
+          "comments": [
+            {
+              "originalPosition": 97,
+              "body": "Please explain why.  The root node is by definition the entire argument.",
+              "createdAt": "2021-05-13T07:18:05Z",
+              "updatedAt": "2021-05-13T07:18:05Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NjU4NjUxODk3",
+          "commit": {
+            "abbreviatedOid": "b9a8483"
+          },
+          "author": "gregsdennis",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2021-05-13T07:21:37Z",
+          "updatedAt": "2021-05-13T07:21:37Z",
+          "comments": [
+            {
+              "originalPosition": 114,
+              "body": "The word \"query\" has no other usage within this spec other than to represent a JSONPath query.  The redundancy doesn't help clarify anything.  (It also appears I missed removing some self-references.)",
+              "createdAt": "2021-05-13T07:21:37Z",
+              "updatedAt": "2021-05-13T07:21:37Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NjU4NjY5MTY5",
+          "commit": {
+            "abbreviatedOid": "b9a8483"
+          },
+          "author": "gregsdennis",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2021-05-13T07:50:19Z",
+          "updatedAt": "2021-05-13T07:50:19Z",
+          "comments": [
+            {
+              "originalPosition": 6,
+              "body": "I think the ones you're thinking of relate to \"names\" in a bracket-selector or filter expression.  These are currently discussed in the \"union selector\" -> \"child\" -> \"syntax\" section, where it's given effectively the same definition as 8259 except that single quotes are also allowed.\r\n\r\nI see the argument to add a \"string\" definition to account for the support of single-quotes.",
+              "createdAt": "2021-05-13T07:50:19Z",
+              "updatedAt": "2021-05-13T07:50:19Z"
             }
           ]
         }
