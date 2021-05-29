@@ -5,12 +5,12 @@
 JSONPath WG                                           G. Normington, Ed.
 Internet-Draft                                                          
 Intended status: Standards Track                           E. Surov, Ed.
-Expires: 14 November 2021                        TheSoul Publishing Ltd.
+Expires: 30 November 2021                        TheSoul Publishing Ltd.
                                                        M. Mikulicic, Ed.
                                                         InfluxData, Inc.
                                                               S. Gössner
                                                  Fachhochschule Dortmund
-                                                             13 May 2021
+                                                             29 May 2021
 
 
                   JSONPath: Query expressions for JSON
@@ -47,7 +47,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 14 November 2021.
+   This Internet-Draft will expire on 30 November 2021.
 
 Copyright Notice
 
@@ -121,11 +121,19 @@ Table of Contents
    example, the Unicode PLACE OF INTEREST SIGN (U+2318) would be defined
    in ABNF as "%x2318".
 
-   The terminology of [RFC8259] applies, including definitions for
-   "Value", "Object", "Array", "Number", and "String".  Additional terms
-   used in this specification are defined below.  Importantly "object"
-   and "array" in particular do not take on a generic meaning, such as
-   they would in a general programming context.
+   The terminology of [RFC8259] applies except where clarified below.
+   Definitions for "Object", "Array", and "Number" remain unchanged.
+   Importantly "object" and "array" in particular do not take on a
+   generic meaning, such as they would in a general programming context.
+
+   Additional terms used in this specification are defined below.
+
+   String:  A sequence of UTF-8 characters surrounded by either single
+      quotes (`) or double quotes (").  Escaping quote characters is
+      required only for the specific character which surrounds the
+      string.  For example, a double quote character (") within a string
+      surrounded by single quotes (') does not need to be escaped.
+      Single quotes are preferred.
 
    Member:  A name/value pair in an object.  (Not itself a value.)
 
@@ -155,15 +163,15 @@ Table of Contents
       represented in JSON, e.g. as an array, the Nodelist is an abstract
       concept unrelated to JSON values.
 
-   Output Path:  A simple form of JSONPath expression that identifies a
-      node by providing a query that results in exactly that node.
-      Similar to, but syntactically different from, a JSON Pointer
-      [RFC6901].
+   Normalized Path:  A simple form of JSONPath expression that
+      identifies a node by providing a query that results in exactly
+      that node.  Similar to, but syntactically different from, a JSON
+      Pointer [RFC6901].
 
    For the purposes of this specification, a value as defined by
    [RFC8259] is also viewed as a tree of nodes.  Each node, in turn,
-   holds a value.  Furthernodes within each value are the elements of
-   Arrays and the member values of objects and are themselves values.
+   holds a value.  Further nodes within each value are the elements of
+   arrays and the member values of objects and are themselves values.
    (The type of the value held by a node is may also be referred to as
    the type of the node.)
 
@@ -412,13 +420,13 @@ Table of Contents
 
 3.1.  Overview
 
-   A JSONPath is a string which selects zero or more nodes of a piece of
-   JSON.  A valid JSONPath conforms to the ABNF syntax defined by this
-   document.
+   A JSONPath query is a string which selects zero or more nodes of a
+   piece of JSON.  A valid query conforms to the ABNF syntax defined by
+   this document.
 
-   A JSONPath MUST be encoded using UTF-8.  To parse a JSONPath
-   according to the grammar in this document, its UTF-8 form SHOULD
-   first be decoded into Unicode code points as described in [RFC3629].
+   A query MUST be encoded using UTF-8.  To parse a JSONPath according
+   to the grammar in this document, its UTF-8 form SHOULD first be
+   decoded into Unicode code points as described in [RFC3629].
 
    A string to be used as a JSONPath query needs to be _well-formed_ and
    _valid_. A string is a well-formed JSONPath query if it conforms to
@@ -481,9 +489,9 @@ Table of Contents
 
 3.3.  Syntax
 
-   Syntactically, a JSONPath consists of a root selector ("$"), which
-   stands for a nodelist that contains the root node of the argument,
-   followed by a possibly empty sequence of _selectors_.
+   Syntactically, a JSONPath query consists of a root selector ("$"),
+   which stands for a nodelist that contains the root node of the
+   argument, followed by a possibly empty sequence of _selectors_.
 
    json-path = root-selector *selector
    root-selector = "$"               ; $ selects document root node
@@ -492,7 +500,7 @@ Table of Contents
 
 3.4.  Semantics
 
-   The root selector "$" not only selects the Root node of the argument,
+   The root selector "$" not only selects the root node of the argument,
    but it also produces as output a list consisting of one node: the
    argument itself.
 
@@ -517,11 +525,11 @@ Table of Contents
       also go up, or to the query argument?
 
    For instance, with the argument "{"a":[{"b":0},{"b":1},{"c":2}]}",
-   the JSONPath "$.a[*].b" selects the following list of nodes: "0", "1"
+   the query "$.a[*].b" selects the following list of nodes: "0", "1"
    (denoted here by their value).  Let's walk through this in detail.
 
-   The JSONPath consists of "$" followed by three selectors: ".a",
-   "[*]", and ".b".
+   The query consists of "$" followed by three selectors: ".a", "[*]",
+   and ".b".
 
    Firstly, "$" selects the root node which is the argument.  So the
    result is a list consisting of just the root node.
@@ -541,7 +549,7 @@ Table of Contents
    respectively, and one of length zero.
 
    As a consequence of this approach, if any of the selectors selects no
-   nodes, then the whole JSONPath selects no nodes.
+   nodes, then the whole query selects no nodes.
 
    In what follows, the semantics of each selector are defined for each
    type of node.
@@ -865,7 +873,7 @@ Detailed Semantics
 
 4.  IANA Considerations
 
-   TBD: Define a media type for JSON Path expressions.
+   TBD: Define a media type for JSONPath expressions.
 
 5.  Security Considerations
 
