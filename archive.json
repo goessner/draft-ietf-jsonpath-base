@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2021-05-20T01:05:42.845391+00:00",
+  "timestamp": "2021-05-30T02:19:45.152831+00:00",
   "repo": "ietf-wg-jsonpath/draft-ietf-jsonpath-base",
   "labels": [
     {
@@ -13685,15 +13685,15 @@
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
-      "body": "Resolves #84\r\n\r\n## Alterations\r\n\r\n- Removed `Value`, `Object`, and `Array` since they are defined in 8259.  Replaced with extended verbiage at the beginning of the section that declares that 8259 applies.\r\n- Replaced \"JSON value\" with \"value\" in line with the above.\r\n\r\n## Additions\r\n\r\n- Root Node\r\n\r\n## Other\r\n\r\n- Reordered terms and paragraphs so that reading through doesn't use terms that haven't been defined yet (as much as possible).\r\n- Removed a redundant parenthetical sentence in the *Processing Model* section.\r\n- Removed some un-necessary self-references (e.g. \"JSONPath query\" rather than just \"query\").\r\n- Made some general edits\r\n\r\n## Notes\r\n\r\n### Existing in-place definitions\r\n\r\n\"Selector\" and \"slice\" are defined in-place where they're needed.  Do we need to define them in the terminology section as well?\r\n\r\n### Key\r\n\r\nThe draft currently uses \"name\" instead of \"key\" as we had agreed in the meeting.  I suspect that this is because 8259 uses \"name.\"  Since we're trying to align with that, I've left in \"name.\"\r\n\r\n### Index\r\n\r\nWe discussed using \"index\" as a generic term for either a numeric index for arrays or a name for objects.  However in editing this section, I'm starting to second-guess that decision.\r\n\r\nGiven that we've opted to define a union selector as taking as arguments \"indices,\" \"slices,\" and/or \"filters,\" I don't think it's too much of a stretch to separately include \"indices\" and \"names.\"  Because of this, I left the definition of \"index\" as is.\r\n\r\nThis also addresses the tendency to associate \"index\" with arrays, as @glyn had mentioned.\r\n\r\nI'm leaving the changes to \"union selector\" to include all of the various things it can accept for another PR as this is solely to clean up terminology.\r\n\r\n### Emphasizing terms\r\n\r\nI tried capitalizing defined terms to emphasize their special meaning.  It got weird to read, though, since they're used so frequently.  Maybe not _every_ instance of the terms needs to be emphasized.  I'm not sure.  Happy to discuss.\r\n\r\nI've left this change out for now, but there are definitely inconsistencies present already.\r\n",
+      "body": "Resolves #84\r\n\r\n## Alterations\r\n\r\n- Removed `Object`, and `Array` since they are defined in 8259.  Replaced with extended verbiage at the beginning of the section that declares that 8259 applies.\r\n- Replaced \"JSON value\" with \"value\" in line with the above.\r\n- Relabeled \"output path\" as \"normalized path\"\r\n\r\n## Additions\r\n\r\n- String - a clarification and expansion on the JSON definition\r\n- Root Node\r\n\r\n## Other\r\n\r\n- Reordered terms and paragraphs so that reading through doesn't use terms that haven't been defined yet (as much as possible).\r\n- Removed a redundant parenthetical sentence in the *Processing Model* section.\r\n- Removed some un-necessary self-references (e.g. \"JSONPath query\" rather than just \"query\").\r\n- Made some general edits\r\n\r\n## Notes\r\n\r\n### Existing in-place definitions\r\n\r\n\"Selector\" and \"slice\" are defined in-place where they're needed.  Do we need to define them in the terminology section as well?\r\n\r\n### Key\r\n\r\nThe draft currently uses \"name\" instead of \"key\" as we had agreed in the meeting.  I suspect that this is because 8259 uses \"name.\"  Since we're trying to align with that, I've left in \"name.\"\r\n\r\n### Index\r\n\r\nWe discussed using \"index\" as a generic term for either a numeric index for arrays or a name for objects.  However in editing this section, I'm starting to second-guess that decision.\r\n\r\nGiven that we've opted to define a union selector as taking as arguments \"indices,\" \"slices,\" and/or \"filters,\" I don't think it's too much of a stretch to separately include \"indices\" and \"names.\"  Because of this, I left the definition of \"index\" as is.\r\n\r\nThis also addresses the tendency to associate \"index\" with arrays, as @glyn had mentioned.\r\n\r\nI'm leaving the changes to \"union selector\" to include all of the various things it can accept for another PR as this is solely to clean up terminology.\r\n\r\n### Emphasizing terms\r\n\r\nI tried capitalizing defined terms to emphasize their special meaning.  It got weird to read, though, since they're used so frequently.  Maybe not _every_ instance of the terms needs to be emphasized.  I'm not sure.  Happy to discuss.\r\n\r\nI've left this change out for now, but there are definitely inconsistencies present already.\r\n",
       "createdAt": "2021-05-12T10:40:26Z",
-      "updatedAt": "2021-05-19T17:08:25Z",
+      "updatedAt": "2021-05-30T00:50:43Z",
       "baseRepository": "ietf-wg-jsonpath/draft-ietf-jsonpath-base",
       "baseRefName": "main",
       "baseRefOid": "c8597e87e9735338ceca4eb6a99c15bf5148dcf2",
       "headRepository": "ietf-wg-jsonpath/draft-ietf-jsonpath-base",
       "headRefName": "84-terminology",
-      "headRefOid": "b9a84834b1b1335d1a4c9b98c682213017bc8e49",
+      "headRefOid": "34ba61b271d5b10b960fe1aaa3b0ae72ae202263",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -13768,6 +13768,13 @@
           "body": "@cabo that was well-stated.  I will try to make another round of edits to reinsert these in such a way that clarity is provided without redefining them.",
           "createdAt": "2021-05-15T07:25:40Z",
           "updatedAt": "2021-05-15T07:25:40Z"
+        },
+        {
+          "author": "gregsdennis",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@cabo @goessner @glyn I've made some updates.  Just tagging you in.",
+          "createdAt": "2021-05-29T22:52:47Z",
+          "updatedAt": "2021-05-29T22:52:47Z"
         }
       ],
       "reviews": [
@@ -14068,6 +14075,46 @@
               "body": "I think we agree with the following ...\r\n\r\n* JSONPath is *selecting* only, not *processing*.\r\n* Analytical post processing on the query result is heavily demanded by users.\r\n\r\nI do like that brillant *extension points* concept a lot. So question is: Can we open the door for analytical post processing via those *extension points*? If so, the spec must provide certainty to implementors regarding *output path* format, which should be either/or ...\r\n\r\n* list of selected values\r\n* list of normalized pathes\r\n\r\nSo an *output path* always should have *normalized path* format in my opinion.",
               "createdAt": "2021-05-19T17:08:25Z",
               "updatedAt": "2021-05-19T17:08:25Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NjcxNzc2NTU2",
+          "commit": {
+            "abbreviatedOid": "b9a8483"
+          },
+          "author": "gregsdennis",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2021-05-29T22:12:11Z",
+          "updatedAt": "2021-05-29T22:12:11Z",
+          "comments": [
+            {
+              "originalPosition": 48,
+              "body": "> So an output path always should have normalized path format in my opinion.\r\n\r\nI'm not arguing this.  I'm questioning whether we need \"output path\" as an explicit definition.\r\n\r\nTo me, \"output path\" is just a normalized path that happens to be in the output.  There's nothing really special about it that requires a definition.  We _do_ need to define the output somewhere, but it's not a definition or term; it's a feature and requires its own section.\r\n\r\n\"Normalized path,\" on the other hand, is precisely what the current definition is describing:\r\n\r\n> A simple form of JSONPath expression that identifies a node by providing a query that results in exactly that node.",
+              "createdAt": "2021-05-29T22:12:11Z",
+              "updatedAt": "2021-05-29T22:12:31Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NjcxNzc3NTU0",
+          "commit": {
+            "abbreviatedOid": "b9a8483"
+          },
+          "author": "gregsdennis",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2021-05-29T22:36:27Z",
+          "updatedAt": "2021-05-29T22:36:27Z",
+          "comments": [
+            {
+              "originalPosition": 97,
+              "body": "> In fact the root node is not a node initially - @goessner \r\n\r\nNot quite.  \"Argument\" is already defined as a value (not a node):\r\n\r\n```\r\nShort name for the value a JSONPath expression is applied to.\r\n```\r\n\r\nThis means that \"entire value of the argument\" is redundant.  My change simply removes the redundancy.  \"Root node of the argument\" identifies the top-level location of the initial JSON value.",
+              "createdAt": "2021-05-29T22:36:27Z",
+              "updatedAt": "2021-05-29T22:36:27Z"
             }
           ]
         }
