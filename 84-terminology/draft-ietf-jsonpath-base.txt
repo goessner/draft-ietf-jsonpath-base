@@ -5,12 +5,12 @@
 JSONPath WG                                           G. Normington, Ed.
 Internet-Draft                                                          
 Intended status: Standards Track                           E. Surov, Ed.
-Expires: 30 November 2021                        TheSoul Publishing Ltd.
+Expires: 1 December 2021                         TheSoul Publishing Ltd.
                                                        M. Mikulicic, Ed.
                                                         InfluxData, Inc.
                                                               S. Gössner
                                                  Fachhochschule Dortmund
-                                                             29 May 2021
+                                                             30 May 2021
 
 
                   JSONPath: Query expressions for JSON
@@ -47,7 +47,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 30 November 2021.
+   This Internet-Draft will expire on 1 December 2021.
 
 Copyright Notice
 
@@ -127,6 +127,11 @@ Table of Contents
    generic meaning, such as they would in a general programming context.
 
    Additional terms used in this specification are defined below.
+
+   Value:  As per [RFC8259], a structure complying to the generic data
+      model of JSON, i.e., composed of components such as containers,
+      namely JSON objects and arrays, and atomic data, namely null,
+      true, false, numbers, and text strings.
 
    String:  A sequence of UTF-8 characters surrounded by either single
       quotes (`) or double quotes (").  Escaping quote characters is
